@@ -3,15 +3,15 @@ An ASP.NET web app developed with Le Quy Don Technical University, written in C#
 Functionalities include login, shopping cart, searching, adding and updating books, file upload (book image), and identity authentication.
 
 ## Screenshots
-![](screenshots/1.PNG)
+![](screenshots/1.png)
 
-![](screenshots/2.PNG)
+![](screenshots/2.png)
 
-![](screenshots/3.PNG)
+![](screenshots/3.png)
 
-![](screenshots/4.PNG)
+![](screenshots/4.png)
 
-![](screenshots/5.PNG)
+![](screenshots/5.png)
 
 ## Contributors
 - **tuyenvdt:** Adding of new book to inventory (with validation and file upload features), Update Inventory, Book details, Home page (CSS), Integration..
