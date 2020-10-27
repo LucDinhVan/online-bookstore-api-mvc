@@ -1,0 +1,47 @@
+﻿
+@{
+    ViewBag.Title = "Thống kê doanh thu";
+    Layout = "~/Views/Shared/_LayoutAmin.cshtml";
+}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<div class="row"></div>
+
+<div style="text-align:center">
+    <h2 class="text-success">
+        <button id="btn_name" class="btn btn-warning pull-left" onclick="TKDT_N()">
+            <i class="fa fa-refresh"></i> Làm mới
+        </button>
+        THỐNG KÊ DOANH THU BÁN HÀNG <span id="Nam_Thang">QUA CÁC NĂM</span>
+    </h2>
+    <div id="all" style="text-align:center">
+    </div>
+</div>
+<script>
+    window.onload = function () {
+        TKDT_N();
+    }
+    function TKDT_N() {
+        $.ajax({
+            type: 'GET',
+            url: '/Chart/_Partial_ThongKeDoanhThu_Nam_Chart',
+            data: {},
+            success: function (data) {
+                $("#all").html(data);
+                $("#btn_name").html("<i class=\"fa fa-refresh\"></i> Làm mới");
+                $("#Nam_Thang").html("QUA CÁC NĂM");
+            }
+        });
+    }
+    function TKDT_T(nam) {
+        $.ajax({
+            type: 'GET',
+            url: '/Chart/_Partial_ThongKeDoanhThu_Thang_Chart',
+            data: { year: nam },
+            success: function (data) {
+                $("#all").html(data);
+                $("#btn_name").html("<i class=\"fa fa-backward\"></i> Quay lại");
+                $("#Nam_Thang").html("CỦA NĂM " + nam);
+            }
+        });
+    }
+</script>

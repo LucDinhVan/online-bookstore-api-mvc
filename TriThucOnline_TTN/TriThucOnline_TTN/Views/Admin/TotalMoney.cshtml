@@ -1,0 +1,34 @@
+﻿@using TriThucOnline_TTN.Models;
+@{
+    SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
+    var sum = (from s in db.CT_DONHANG
+               join k in db.DONHANGs on s.MaDH equals k.MaDH
+               where k.TrangThaiThanhToan == "Đã thanh toán"
+               select s.DonGia).Sum();
+    var sumTong = (from s in db.CT_DONHANG
+                   join k in db.DONHANGs on s.MaDH equals k.MaDH
+                   where k.TrangThaiThanhToan == "Chưa thanh toán"
+                   select s.DonGia).Sum();
+}
+<div class="col-sm-6 col-lg-3">
+    <div class="overview-item overview-item--c4">
+        <div class="overview__inner">
+            <div class="overview-box clearfix">
+                <div class="icon">
+                    <i class="zmdi zmdi-money"></i>
+                </div>
+                <div class="text">
+                    <h2>
+                        @{string money = String.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN").NumberFormat, "{0:c}", sum);}
+                        @money
+                    </h2>
+                    <span>Tổng thu nhập</span>
+                </div>
+            </div>
+            <div class="overview-chart">
+                <div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
+                <canvas id="widgetChart4" height="115" width="187" class="chartjs-render-monitor" style="display: block;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>

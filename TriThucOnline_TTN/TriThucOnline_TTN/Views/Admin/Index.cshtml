@@ -1,0 +1,12 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_LayoutAmin.cshtml";
+}
+
+<div class=" row">
+    @{Html.RenderPartial("TotalMember");}
+    @{Html.RenderPartial("TotalBook");}
+    @{Html.RenderPartial("TotalDHChuaThanhToan"); }
+    @{Html.RenderPartial("TotalMoney");}
+</div>
+
