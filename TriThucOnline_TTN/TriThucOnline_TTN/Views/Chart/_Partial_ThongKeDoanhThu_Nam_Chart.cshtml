@@ -1,0 +1,65 @@
+﻿@using TriThucOnline_TTN.Models;
+@model List<ThongKeDoanhThuTheoNam>
+@{
+    ViewBag.Title = "Thong Ke Doanh Thu Qua Cac Nam";
+
+}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<div class="col-md-10 col-md-offset-1">
+    <div class="text-left"><strong>VNĐ</strong></div>
+    <div class="row">
+        <canvas id="MyChart" width="800" height="400"></canvas>
+        <strong>Năm</strong>
+    </div>
+</div>
+
+@{ int i = 0;
+    string listNam = "", listTongTien = "";
+    foreach (var item in Model)
+    {
+        listNam += item.Nam;
+        listTongTien += string.Format("{0:0}", item.TongTien);
+        if (i != Model.Count - 1)
+        {
+            listNam += ",";
+            listTongTien += ",";
+        }
+        i++;
+    }
+}
+<script>
+    var data1 = {
+        labels: [@listNam],
+        datasets: [
+            {
+                label: "Doanh thu",
+                backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
+                data: [@listTongTien]
+            }
+        ]
+    };
+    var myBarChart = new Chart(document.getElementById("MyChart"), {
+        type: 'bar',
+        data: data1,
+        options: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: 'Doanh thu qua các năm'
+            }
+        }
+    });
+
+    $("#MyChart").click(
+        function clickHandler (evt) {
+            var firstPoint = myBarChart.getElementAtEvent(evt)[0];
+
+            if (firstPoint) {
+                var label = myBarChart.data.labels[firstPoint._index];
+                var value = myBarChart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
+            }
+            TKDT_T(label);
+        }
+    );
+</script>
+

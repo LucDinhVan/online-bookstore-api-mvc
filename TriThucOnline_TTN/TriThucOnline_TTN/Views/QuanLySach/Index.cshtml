@@ -1,0 +1,115 @@
+﻿@using PagedList.Mvc;
+@using PagedList;
+@model PagedList.PagedList<TriThucOnline_TTN.Models.DAUSACH>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutAmin.cshtml";
+}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/Content/bootstrap.min.css">
+<link rel="stylesheet" href="~/Content/Register/css/style.css">
+<script src="~/Scripts/jquery-3.5.0.min.js"></script>
+<script src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")" type="text/javascript"></script>
+<style>
+
+    .MenuTrang li {
+        display: inline;
+    }
+
+    .img-responsive {
+        width: 50px;
+    }
+</style>
+<h2>Quản lý Sách</h2>
+
+<p>
+    @*@Html.ActionLink("Thêm mới sách", "ThemMoi")*@
+    <a href="@Url.Action("ThemMoi")" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i> Thêm sách</a>
+    <div class="form-inline">
+        <input class="form-control mr-sm-2" type="search" name="search" id="search" value="@ViewBag.search" placeholder="Tên sách ...">
+        
+        <button class="form-control btn-secondary" onclick="Search(document.getElementById('search').value)">Tìm kiếm</button>
+    </div>
+    
+</p>
+<div id="Xoa_Sach">
+    @{ Html.RenderPartial("IndexPartial");}
+</div>
+
+@* Tạo link liên kết các trang*@
+
+
+<script>
+    function delete_article(Id) {
+        var answer = confirm("Bạn có chắc muốn xóa sách này?");
+        if (answer) {
+            //alert('Xác nhận xóa');
+            Remove(Id);
+        }
+    }
+
+    function Remove(Id) {
+        $.ajax({
+            type: 'POST',
+            url: '/QuanLySach/Remove',
+            data: { id: Id },
+            success: function (data) {
+                $.post(data.Url, function (partial) {
+                    $("#Xoa_Sach").html(partial);
+                });
+            }
+        });
+    }
+    function ChiTietSach(masach) {
+        $.ajax({
+            type: 'POST',
+            url: '/QuanLySach/XemCTSach',
+            data: { masach: masach },
+            success: function (data) {
+                $.post(data.Url, function (partial) {
+                    $("#All_Dialog").html(partial)
+                });
+            }
+        });
+        $('#myModal').on('shown.bs.modal', function () {
+            $(this).find('.modal-dialog').css({
+                width: '935px',
+                height: 'auto',
+                'max-height': '100%',
+                'max-width': '1000px',
+            });
+        });
+        $("#myModal").modal();
+    }
+    function Search(keyword) {
+        $.ajax({
+            type: 'GET',
+            url: '/QuanLySach/Search',
+            data: { search: keyword },
+            success: function (data) {
+                $("#Xoa_Sach").html(data);
+            }
+        });
+    }
+</script>
+@* đây là cái bảng dialog *@
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Chi tiết sách</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                @* nội dung bên trong all_dialog *@
+                <div id="All_Dialog"></div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>

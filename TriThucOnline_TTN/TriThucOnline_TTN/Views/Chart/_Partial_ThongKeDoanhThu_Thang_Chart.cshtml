@@ -1,0 +1,61 @@
+﻿@using TriThucOnline_TTN.Models;
+@model List<ThongKeDoanhThuTheoThang>
+@{
+    ViewBag.Title = "Thong Ke Doanh Thu Qua Cac Thang";
+
+}
+<div class="col-md-10 col-md-offset-1">
+    <div class="text-left"><strong>VNĐ</strong></div>
+    <div class="row">
+        <canvas id="MyChart" width="800" height="400"></canvas>
+        <strong>Tháng</strong>
+    </div>
+</div>
+
+@{ int i = 0;
+    string listNam = "", listTongTien = "";
+    foreach (var item in Model)
+    {
+        listNam += item.Thang;
+        listTongTien += string.Format("{0:0}", item.TongTien);
+        if (i != Model.Count - 1)
+        {
+            listNam += ",";
+            listTongTien += ",";
+        }
+        i++;
+    }
+}
+<script>
+    var data1 = {
+        labels: [@listNam],
+        datasets: [
+            {
+                label: "Doanh thu",
+                data: [@listTongTien],
+                fill: false,
+                borderColor: "rgb(75, 192, 192)",
+                lineTension: 0.1
+            }
+        ]
+    };
+
+    var myBarChart = new Chart(document.getElementById("MyChart"), {
+        type: 'line',
+        data: data1,
+        options: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: 'Doanh thu các tháng'
+            }
+        }
+    });
+
+    $("#MyChart").click(
+        function (evt) {
+            TKDT_N();
+        }
+    );
+</script>
+

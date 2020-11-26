@@ -1,0 +1,31 @@
+﻿@using TriThucOnline_TTN.Models;
+@{ 
+    SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
+    var sum = (from s in db.DONHANGs
+               select s).Count();
+    var sumChuaThanhToan = (from s in db.DONHANGs
+                            where s.TrangThaiThanhToan == "Chưa thanh toán"
+                            select s).Count();
+}
+
+<div class="col-sm-6 col-lg-3">
+    <div class="overview-item overview-item--c3">
+        <div class="overview__inner">
+            <div class="overview-box clearfix">
+                <div class="icon">
+                    <i class="zmdi zmdi-shopping-cart"></i>
+                </div>
+                <div class="text">
+                    <h2>@string.Format("{0:0,0}", sum)</h2>
+                    <span>đơn hàng</span>
+                </div>
+            </div>
+            <div class="overview-chart">
+                <div class="text">
+                    <h2>@string.Format("{0:0,0}", sumChuaThanhToan)</h2>
+                    <span>Đơn chưa thanh toán</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

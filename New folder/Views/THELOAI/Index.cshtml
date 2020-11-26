@@ -1,0 +1,34 @@
+﻿@model IEnumerable<TriThucOnline_TTN.Models.THELOAI>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutAmin.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.TenTL)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.TenTL)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.MaTL }) |
+            @Html.ActionLink("Details", "Details", new { id=item.MaTL }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.MaTL })
+        </td>
+    </tr>
+}
+
+</table>

@@ -1,0 +1,33 @@
+﻿@using TriThucOnline_TTN.Models;
+@{
+    SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
+    var sum = (from s in db.DAUSACHes
+               select s.MaSach).Count();
+    var sumMoi = (from s in db.DAUSACHes
+                  where s.Moi == 1
+                  select s.MaSach).Count();
+}
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+<div class="col-sm-6 col-lg-3">
+    <div class="overview-item overview-item--c2">
+        <div class="overview__inner">
+            <div class="overview-box clearfix">
+                <div class="icon">
+                    <i class="zmdi zmdi-book-photo"></i>
+                </div>
+                <div class="text">
+                    <h2>@string.Format("{0:0,0}", sum)</h2>
+                    <span>đầu sách</span>
+                </div>
+            </div>
+            <div class="overview-chart">
+                <div class="text">
+                    <h2>@string.Format("{0:0,0}", sumMoi)</h2>
+                    <span>mới</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

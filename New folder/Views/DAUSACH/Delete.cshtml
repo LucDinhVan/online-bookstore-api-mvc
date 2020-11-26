@@ -1,0 +1,121 @@
+﻿@model TriThucOnline_TTN.Models.DAUSACH
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_LayoutAmin.cshtml";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>DAUSACH</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TenSach)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TenSach)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NamXuatBan)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NamXuatBan)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.GiaTien)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.GiaTien)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PicBook)
+        </dt>
+
+        <dd>
+            <img src="@Html.DisplayFor(model => model.PicBook)" style="width:30%"/>
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SoTrang)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SoTrang)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BoCucSach)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BoCucSach)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TrichDan)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TrichDan)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SoLuongTon)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SoLuongTon)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Moi)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Moi)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TACGIA.TenTG)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TACGIA.TenTG)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.THELOAI.TenTL)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.THELOAI.TenTL)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NXB.TenNXB)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NXB.TenNXB)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

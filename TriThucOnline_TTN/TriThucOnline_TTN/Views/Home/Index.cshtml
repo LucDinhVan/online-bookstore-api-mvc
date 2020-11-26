@@ -1,0 +1,216 @@
+﻿@using PagedList.Mvc;
+@using PagedList;
+@model PagedList.PagedList<TriThucOnline_TTN.Models.DAUSACH>
+
+
+@{
+    ViewBag.Title = "Cửa hàng sách trực tuyến";
+}
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <link rel="stylesheet" type="text/css" href="Scripts/slick/slick/slick.css">
+    <link rel="stylesheet" type="text/css" href="Scripts/slick/slick/slick-theme.css">
+    <link href="https://fonts.googleapis.com/css?family=Baloo+Chettan+2:400,700&display=swap&subset=vietnamese" rel="stylesheet">
+
+    @Styles.Render("/Assets/User/css/style_home.css")
+
+    <style>
+
+        .pic_book {
+            height: 66%;
+        }
+
+        .title_book {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 15%;
+        }
+
+        .price_book {
+            font-weight: 700;
+            font-size: 20px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3" style="padding-right:0;">
+                <div class="vertical-menu">
+                    <h4>Danh Mục Sản Phẩm</h4>
+                    @foreach (var item in ViewBag.CacTheLoai)
+                    {
+                        <a href="@Url.Action("Details", "THELOAI", new { @id = item.id })">@item.name</a>
+                    }
+
+                </div>
+            </div>
+            <div class="col-lg-9" style="padding-left:0;">
+                <section class="regular slider" style="margin-top:0;">
+                    <div>
+                        <img src="https://static.ybox.vn/2018/5/4/1526528133509-Slide1.JPG">
+                    </div>
+                    <div>
+                        <img src="https://static.ybox.vn/2018/5/4/1526528133509-Slide1.JPG">
+                    </div>
+                    <div>
+                        <img src="https://static.ybox.vn/2018/5/4/1526528133509-Slide1.JPG">
+                    </div>
+                    <div>
+                        <img src="https://static.ybox.vn/2018/5/4/1526528133509-Slide1.JPG">
+                    </div>
+                    <div>
+                        <img src="https://static.ybox.vn/2018/5/4/1526528133509-Slide1.JPG">
+                    </div>
+
+                </section>
+
+            </div>
+        </div>
+
+    </div>
+
+    @*===================================== BANNER - CENTER- ADVERTISMENT =======================*@
+
+    <div class="container-fluid banner-center">
+        <div class="row">
+            <div class="col-md-4">
+                <i class="fas fa-star-of-david"></i>
+                <p>Cung cấp các đầu sách chính hãng, chất lượng nhất </p>
+            </div>
+            <div class="col-md-4">
+                <i class="fas fa-fighter-jet"></i>
+                <p>Giao hàng nhanh chóng</p>
+            </div>
+            <div class="col-md-4">
+                <i class="fas fa-hand-holding-usd"></i>
+                <p>Chính sách đổi trả, hoàn tiền dễ dàng</p>
+            </div>
+        </div>
+    </div>
+
+    @*================================ TAB-MENU  BOOK -=========================================*@
+
+    
+<div class="container">
+
+
+    <hr />
+    <h3>Sách mới</h3>
+    <br />
+    @*@{ Html.RenderPartial("_PartitalView_SachMoi"); }*@
+    @*<br />
+    @{ Html.RenderPartial("_Paging"); }
+    <h3>Sách bán chạy</h3>
+    <br />
+    @{ Html.RenderPartial("_PartitalView_SachBanChay"); }
+    <br />
+    @{ Html.RenderPartial("_Paging"); }*@
+    <hr />
+    <div style="margin-top:50px">
+        @foreach (var theloai in ViewBag.CacTheLoai)
+        {
+
+            <h4>@theloai.name</h4>
+
+            <div>
+
+                    @{Html.RenderAction("Detail", "Home", new { @MaTL = theloai.id });}
+
+            </div>
+        }
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script src="https://code.jquery.com/jquery-2.2.0.min.js" type="text/javascript"></script>
+    <script src="~/Scripts/slick/slick/slick.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        $(document).on('ready', function () {
+
+            $(".regular").slick({
+                        dots: true,
+                infinite: true,
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                autoplay: true,
+                autoplaySpeed: 3000
+            });
+            $(".center").slick({
+                        dots: true,
+                infinite: true,
+                centerMode: true,
+                slidesToShow: 5,
+                slidesToScroll: 3,
+                responsive: [
+              {
+                            breakpoint: 1000,
+                  settings: {
+                                slidesToShow: 3,
+                      slidesToScroll: 2,
+                      infinite: true,
+                      dots: true
+                  }
+                            },
+              {
+                            breakpoint: 600,
+                  settings: {
+                                slidesToShow: 2,
+                      slidesToScroll: 1
+                  }
+                            }
+            ]
+            });
+
+                    });
+
+    @*$('#tabstrip a').click(function (e) {
+                        e.preventDefault()
+        var tabID = $(this).attr("href").substr(1);
+        $(".tab-pane").each(function () {
+                            console.log("clearing " + $(this).attr("id") + " tab");
+            $(this).empty();
+                        });
+
+        $.ajax({
+                        url: "/@ViewContext.RouteData.Values["controller"]/" + tabID,
+            cache: false,
+            type: "get",
+            dataType: "html",
+            success: function (result) {
+                $("#" + tabID).html(result);
+                            }
+
+                        })
+   $(this).tab('show')
+});*@
+    </script>
+
+</body>
+</html>
+
