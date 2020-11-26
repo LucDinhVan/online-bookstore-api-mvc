@@ -172,6 +172,7 @@
     <Compile Include="Models\KHUYENMAI.cs">
       <DependentUpon>SQL_TriThucOnline_BanSach.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ModelAPI.cs" />
     <Compile Include="Models\NXB.cs">
       <DependentUpon>SQL_TriThucOnline_BanSach.tt</DependentUpon>
     </Compile>

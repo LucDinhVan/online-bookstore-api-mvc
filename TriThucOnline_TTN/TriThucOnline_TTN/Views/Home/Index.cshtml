@@ -49,7 +49,7 @@
                     <h4>Danh Mục Sản Phẩm</h4>
                     @foreach (var item in ViewBag.CacTheLoai)
                     {
-                        <a href="@Url.Action("Details", "THELOAI", new { @id = item.MaTL })">@item.TenTL</a>
+                        <a href="@Url.Action("Details", "THELOAI", new { @id = item.id })">@item.name</a>
                     }
 
                 </div>
@@ -107,24 +107,24 @@
     <hr />
     <h3>Sách mới</h3>
     <br />
-    @{ Html.RenderPartial("_PartitalView_SachMoi"); }
-    <br />
+    @*@{ Html.RenderPartial("_PartitalView_SachMoi"); }*@
+    @*<br />
     @{ Html.RenderPartial("_Paging"); }
     <h3>Sách bán chạy</h3>
     <br />
     @{ Html.RenderPartial("_PartitalView_SachBanChay"); }
     <br />
-    @{ Html.RenderPartial("_Paging"); }
+    @{ Html.RenderPartial("_Paging"); }*@
     <hr />
     <div style="margin-top:50px">
-        @foreach (var theloai in ViewBag.TheLoai)
+        @foreach (var theloai in ViewBag.CacTheLoai)
         {
 
-            <h4>@theloai.TenTL</h4>
+            <h4>@theloai.name</h4>
 
             <div>
 
-                    @{Html.RenderAction("Detail", "Home", new { @MaTL = theloai.MaTL });}
+                    @{Html.RenderAction("Detail", "Home", new { @MaTL = theloai.id });}
 
             </div>
         }
