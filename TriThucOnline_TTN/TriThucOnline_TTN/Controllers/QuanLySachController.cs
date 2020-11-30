@@ -6,6 +6,8 @@ using System.Web.Mvc;
 using TriThucOnline_TTN.Models;
 using System.IO;
 using PagedList;
+using Newtonsoft.Json;
+using RestSharp;
 
 namespace TriThucOnline_TTN.Controllers
 {
@@ -14,12 +16,29 @@ namespace TriThucOnline_TTN.Controllers
     {
         // GET: QuanLyDAUSACH
         SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
-        
+
         public ActionResult Index(int? page)
         {
+            Books books = null;
             int pageNumber = (page ?? 1);
-            int pageSize = 10;
-            return View(db.DAUSACHes.ToList().OrderBy(n => n.MaSach).ToPagedList(pageNumber, pageSize));
+            // GET
+
+            Extensions.request = new RestRequest($"books?page={pageNumber}", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                books = JsonConvert.DeserializeObject<Books>(result.Content);
+            }
+            else
+            {
+
+            }
+
+            return View(books);
         }
         public PartialViewResult Search(string search, int? nxb, int? tg, int? theloai, int? trichdan)
         {
@@ -31,18 +50,37 @@ namespace TriThucOnline_TTN.Controllers
                 $" or tentl like N'%{search}%'" +
                 $" or TenTG like N'%{search}%'" +
                 $" or TenNXB like N'%{search}%'";
-            
+
             ViewBag.search = search;
             int pageNumber = 1;
             int pageSize = 10;
             db.DAUSACHes.SqlQuery(query).ToList().ToPagedList(pageNumber, pageSize);
             return PartialView("IndexPartial", db.DAUSACHes.SqlQuery(query).ToList().ToPagedList(pageNumber, pageSize));
         }
+
+        [HttpGet]
         public PartialViewResult IndexPartial(int? page)
         {
+            Books books = null;
             int pageNumber = (page ?? 1);
-            int pageSize = 10;
-            return PartialView("IndexPartial", db.DAUSACHes.ToList().OrderBy(n => n.MaSach).ToPagedList(pageNumber, pageSize));
+            // GET
+
+            Extensions.request = new RestRequest($"books?page={pageNumber}", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                books = JsonConvert.DeserializeObject<Books>(result.Content);
+            }
+            else
+            {
+
+            }
+
+            return PartialView(books);
         }
         //Thêm mới 
         [HttpGet]
@@ -95,7 +133,7 @@ namespace TriThucOnline_TTN.Controllers
             {
                 return View(sach);
             }
-            
+
             return RedirectToAction("Index");
             //return View();
         }
@@ -103,7 +141,7 @@ namespace TriThucOnline_TTN.Controllers
         [HttpGet]
         public ActionResult ChinhSua(int MaSach)
         {
-            
+
             //Lấy ra đối tượng sách theo mã 
             DAUSACH sach = db.DAUSACHes.SingleOrDefault(n => n.MaSach == MaSach);
             if (sach == null)
@@ -164,17 +202,27 @@ namespace TriThucOnline_TTN.Controllers
 
         }
 
-        [HttpPost]
-        public JsonResult XemCTSACH(int masach)
+        public PartialViewResult XemCTSACHPartial(int? id)
         {
-            TempData["masach"] = masach;
-            return Json(new { Url = Url.Action("XemCTSACHPartial") });
-        }
-        public PartialViewResult XemCTSACHPartial()
-        {
-            int maDAUSACH = (int)TempData["masach"];
-            var lstDAUSACH = db.DAUSACHes.Where(n => n.MaSach == maDAUSACH).ToList();
-            return PartialView(lstDAUSACH);
+            Book book = null;
+            // GET
+
+            Extensions.request = new RestRequest($"books/{id}", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                book = JsonConvert.DeserializeObject<Book>(result.Content);
+            }
+            else
+            {
+
+            }
+
+            return PartialView(book);
         }
 
         [HttpPost]

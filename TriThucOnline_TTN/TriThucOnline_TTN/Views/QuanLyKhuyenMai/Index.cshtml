@@ -48,6 +48,9 @@
                     $.post(data.Url, function (partial) {
                         $("#Xoa_KM").html(partial);
                     });
+                },
+                error: function () {
+                    alert("Đã có lỗi xảy ra khi xóa");
                 }
             });
         }

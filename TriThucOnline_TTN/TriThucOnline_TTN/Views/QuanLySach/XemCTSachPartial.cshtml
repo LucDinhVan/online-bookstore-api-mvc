@@ -1,5 +1,4 @@
-﻿@using TriThucOnline_TTN.Models;
-@model List<DAUSACH>
+﻿@model TriThucOnline_TTN.Models.Book
 
 <table class="table table-bordered table-hover table-condensed table-striped">
     <thead>
@@ -13,32 +12,33 @@
             <th>Số lượng tồn:</th>
             <th>Chủ đề:</th>
             <th>Nhà xuất bản:</th>
-            <th>Mới:</th>
+            <th>Tác giả:</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.MaSach</td>
-                <td>@item.TenSach</td>
-                <td>@string.Format("{0:0,0}", item.GiaTien) VNĐ</td>
-                @if (item.TrichDan.Length <= 140)
-                { <td>@item.TrichDan</td>}
-                else
-                {
-                  <td>@item.TrichDan.Substring(0, 140) ...</td>
-                }
-                <td>@item.NamXuatBan</td>
-                <td>
-                    <img src="@Url.Content("~/Content/HinhAnhSP/"+item.PicBook)" class="img-responsive" style="width: 150px; height: auto"/>
-                </td>
-                <td>@item.SoLuongTon</td>
-                <td>@Html.DisplayFor(modelItem => item.THELOAI.TenTL)</td>
-                <td>@Html.DisplayFor(modelItem => item.NXB.TenNXB)</td>
-                <td>@item.Moi</td>
-                
-            </tr>
-        }
+
+        <tr>
+            <td>@model.id</td>
+            <td>@model.title</td>
+            <td>@string.Format("{0:0,0}", model.price) VNĐ</td>
+            @if (model.quotes_about.Length <= 140)
+            {
+                <td>@model.quotes_about </td>
+            }
+            else
+            {
+                <td>@model.quotes_about.Substring(0, 140) ...</td>
+            }
+            <td>@model.publish_year </td>
+            <td>
+                <img src="@model.picture" class="img-responsive" style="width: 150px; height: auto"/>
+            </td>
+            <td>@model.quantity</td>
+            <td>@model.category_name </td>
+            <td>@model.publisher_name </td>
+            <td>@model.author_name </td>
+
+        </tr>
+
     </tbody>
 </table>

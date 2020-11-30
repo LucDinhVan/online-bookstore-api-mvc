@@ -1,9 +1,6 @@
-﻿@using PagedList.Mvc;
-@using PagedList;
-@model PagedList.PagedList<TriThucOnline_TTN.Models.DAUSACH>
-
+﻿@model TriThucOnline_TTN.Models.Books
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Quản lý sách";
     Layout = "~/Views/Shared/_LayoutAmin.cshtml";
 }
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css" rel="stylesheet" />
@@ -11,6 +8,111 @@
 <link rel="stylesheet" href="~/Content/Register/css/style.css">
 <script src="~/Scripts/jquery-3.5.0.min.js"></script>
 <script src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")" type="text/javascript"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<style>
+    .modal-confirm {
+        color: #434e65;
+        width: 525px;
+    }
+
+        .modal-confirm .modal-content {
+            padding: 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        .modal-confirm .modal-header {
+            background: #47c9a2;
+            border-bottom: none;
+            position: relative;
+            text-align: center;
+            margin: -20px -20px 0;
+            border-radius: 5px 5px 0 0;
+            padding: 35px;
+        }
+
+        .modal-confirm h4 {
+            text-align: center;
+            font-size: 36px;
+            margin: 10px 0;
+        }
+
+        .modal-confirm .form-control, .modal-confirm .btn {
+            min-height: 40px;
+            border-radius: 3px;
+        }
+
+        .modal-confirm .close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: #fff;
+            text-shadow: none;
+            opacity: 0.5;
+        }
+
+            .modal-confirm .close:hover {
+                opacity: 0.8;
+            }
+
+        .modal-confirm .icon-box {
+            color: #fff;
+            width: 95px;
+            height: 95px;
+            display: inline-block;
+            border-radius: 50%;
+            z-index: 9;
+            border: 5px solid #fff;
+            padding: 15px;
+            text-align: center;
+        }
+
+            .modal-confirm .icon-box i {
+                font-size: 64px;
+                margin: -4px 0 0 -4px;
+            }
+
+        .modal-confirm.modal-dialog {
+            margin-top: 80px;
+        }
+
+        .modal-confirm .btn, .modal-confirm .btn:active {
+            color: #fff;
+            border-radius: 4px;
+            background: #eeb711 !important;
+            text-decoration: none;
+            transition: all 0.4s;
+            line-height: normal;
+            border-radius: 30px;
+            margin-top: 10px;
+            padding: 6px 20px;
+            border: none;
+        }
+
+            .modal-confirm .btn:hover, .modal-confirm .btn:focus {
+                background: #eda645 !important;
+                outline: none;
+            }
+
+            .modal-confirm .btn span {
+                margin: 1px 3px 0;
+                float: left;
+            }
+
+            .modal-confirm .btn i {
+                margin-left: 1px;
+                font-size: 20px;
+                float: right;
+            }
+
+    .trigger-btn {
+        display: inline-block;
+        margin: 100px auto;
+    }
+</style>
 <style>
 
     .MenuTrang li {
@@ -28,13 +130,94 @@
     <a href="@Url.Action("ThemMoi")" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i> Thêm sách</a>
     <div class="form-inline">
         <input class="form-control mr-sm-2" type="search" name="search" id="search" value="@ViewBag.search" placeholder="Tên sách ...">
-        
+
         <button class="form-control btn-secondary" onclick="Search(document.getElementById('search').value)">Tìm kiếm</button>
     </div>
-    
+
 </p>
-<div id="Xoa_Sach">
-    @{ Html.RenderPartial("IndexPartial");}
+<div id="Books">
+    <div class="table-responsive">
+        <table class="table table-condensed table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th width="80">
+                        <span class="text-primary">Mã</span>
+                    </th>
+                    <th>
+                        <span class="text-primary">Tên sách</span>
+
+                    </th>
+                    <th>
+                        <span class="text-primary">Ảnh bìa</span>
+
+                    </th>
+                    <th>
+                        <span class="text-primary">Số lượng tồn</span>
+
+                    </th>
+                    <th>
+                        <span class="text-primary">Thể loại</span>
+
+                    </th>
+                    <th>
+                        <span class="text-primary">NXB</span>
+
+                    </th>
+                    <th><span class="text-primary">Chức năng</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.items)
+                {
+                    <tr>
+                        <td width="80">
+                            @item.id
+                        </td>
+                        <td width="200">
+                            @item.title
+                        </td>
+                        <td>
+                            <div id="AnhBia">
+                                <img src="@item.picture" class="img-responsive" style="width: 150px; height: auto" />
+                            </div>
+                        </td>
+                        <td>
+                            @item.quantity
+                        </td>
+                        <td>
+                            @item.category_name
+                        </td>
+                        <td>
+                            @item.publisher_name
+                        </td>
+                        <td>
+                            @*@Html.ActionLink("Chỉnh sửa", "ChinhSua", new { @MaSach = item.MaSach }) |
+                                @Html.ActionLink("Hiển thị", "HienThi", new { @MaSach = item.MaSach }) |
+                                @Html.ActionLink("Xoa", "Xoa", new { @MaSach = item.MaSach })*@
+
+                            <a href="/QuanLySach/ChinhSua?MaSach=@item.id"><i class="far fa-edit"></i></a>
+                            @*<a href="/QuanLySach/HienThi?MaSach=@item.MaSach" class="btn btn-primary btn-sm btn-color-primary"><i class="glyphicon glyphicon-eye-open"></i></a>*@
+                            <button onclick="ChiTietSach('@item.id')"><i class="fas fa-info-circle"></i></button>
+                            <button onclick="delete_article('@item.id')"><i class="far fa-trash-alt" style="color:red"></i></button>
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    Trang @Model.page/@Model.pages
+    <div class="MenuTrang">
+        <ul class="pagination">
+            @for (var i = 1; i <= Model.pages; i++)
+            {
+                <li class="page-item @(i == Model.page ? "active" : "")">
+                    <a class="page-link" onclick="NextPage(@i)">@i</a>
+                </li>
+            }
+        </ul>
+    </div>
+
 </div>
 
 @* Tạo link liên kết các trang*@
@@ -55,21 +238,30 @@
             url: '/QuanLySach/Remove',
             data: { id: Id },
             success: function (data) {
+                $("#deletedModal").modal();
                 $.post(data.Url, function (partial) {
                     $("#Xoa_Sach").html(partial);
                 });
             }
         });
     }
-    function ChiTietSach(masach) {
+
+    function NextPage(page) {
         $.ajax({
-            type: 'POST',
-            url: '/QuanLySach/XemCTSach',
-            data: { masach: masach },
+            type: 'GET',
+            url: '/QuanLySach/IndexPartial?page=' + page,
             success: function (data) {
-                $.post(data.Url, function (partial) {
-                    $("#All_Dialog").html(partial)
-                });
+                $("#Books").html(data);
+            }
+        });
+    }
+
+    function ChiTietSach(id) {
+        $.ajax({
+            type: 'GET',
+            url: '/QuanLySach/XemCTSACHPartial?id=' + id,
+            success: function (data) {
+                $("#All_Dialog").html(partial)
             }
         });
         $('#myModal').on('shown.bs.modal', function () {
@@ -89,9 +281,17 @@
             data: { search: keyword },
             success: function (data) {
                 $("#Xoa_Sach").html(data);
+            },
+            error: function () {
+                alert("Đã có lỗi xảy ra khi xóa");
             }
         });
     }
+    $(document).ready(function () {
+        $("html, body").animate({ scrollTop: 0 }, 500);
+        $('.MenuTrang').find('li').addClass('page-item');
+        $('.MenuTrang').find('li').find('a').addClass('page-link');
+    })
 </script>
 @* đây là cái bảng dialog *@
 <div id="myModal" class="modal fade" role="dialog">
@@ -112,4 +312,20 @@
             </div>
         </div>
     </div>
-</div>
+</div>    <!-- Modal HTML -->
+<div id="deletedModal" class="modal fade">
+    <div class="modal-dialog modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <div class="icon-box">
+                    <i class="material-icons">&#xE876;</i>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body text-center">
+                <h4>Đã xóa!</h4>
+                <p>Đã xóa thành công</p>
+            </div>
+        </div>
+    </div>
+</div>    

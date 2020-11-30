@@ -1,6 +1,6 @@
 ﻿@using PagedList.Mvc;
 @using PagedList;
-@model PagedList.PagedList<TriThucOnline_TTN.Models.TACGIA>
+@model PagedList.PagedList<TriThucOnline_TTN.Models.Author>
 
 <div class="table-responsive">
     <table class="table table-condensed table-bordered table-striped table-hover">
@@ -26,23 +26,23 @@
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.MaTG)
+                        @Html.DisplayFor(modelItem => item.id)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.TenTG)
+                        @Html.DisplayFor(modelItem => item.name)
                     </td>
                     <td>
-                        <img src="@Url.Content("~/Content/HinhAnhTG/"+item.PicTG)" class="img-responsive" style="width: 150px; height: auto"/>
+                        <img src="@item.picture" class="img-responsive" style="width: 150px; height: auto"/>
                      </td>
                     <td>
-                        <a href="@Url.Action("Edit", new { @MaTacGia = item.MaTG })">
+                        <a href="@Url.Action("Edit", new { @MaTacGia = item.id })">
                             <i class="far fa-edit"></i>
                         </a>
 
-                        <a onclick="ChiTietTG('@item.MaTG')">
+                        <a onclick="ChiTietTG('@item.id')">
                             <i class="fas fa-info-circle"></i>
                         </a>
-                        <button onclick="delete_article('@item.MaTG')" style="color:red">
+                        <button onclick="delete_article('@item.id')" style="color:red">
                             <i class="far fa-trash-alt"></i>
                         </button>
                     </td>

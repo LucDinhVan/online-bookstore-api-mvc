@@ -10,10 +10,10 @@ namespace TriThucOnline_TTN.Models
         public int id {get; set;}
         public string title {get; set;}
         public float price {get; set;}
-        public int publish_year {get; set;}
+        public int? publish_year {get; set;}
         public string picture {get; set;}
-        public int page_number {get; set;}
-        public int quantity {get; set;}
+        public int? page_number {get; set;}
+        public int? quantity {get; set;}
         public string quotes_about {get; set;}
         public int author_id {get; set;}
         public int publisher_id {get; set;}
@@ -29,7 +29,7 @@ namespace TriThucOnline_TTN.Models
         public bool has_previous { get; set; }
         public int page { get; set;}
         public int pages { get; set;}
-        public List<Books> items { get; set; }
+        public List<Book> items { get; set; }
     }
 
     public class Category
@@ -107,7 +107,7 @@ namespace TriThucOnline_TTN.Models
         public string description { get; set;}
         public float discount { get; set;}
         public float max_value { get; set;}
-        public int count { get; set;}
+        public int? count { get; set;}
         public float valid_from { get; set;}
         public float valid_until { get; set;}
         public bool is_enable { get; set; }
@@ -141,7 +141,7 @@ namespace TriThucOnline_TTN.Models
     public class OrderDetail
     {
         public int id { get; set;}
-        public int quantity { get; set;}
+        public int? quantity { get; set;}
         public float price { get; set;}
         public int order_id { get; set;}
         public int book_id { get; set;}        

@@ -8,6 +8,10 @@ using TriThucOnline_TTN.Models;
 using PagedList;
 using PagedList.Mvc;
 using System.IO;
+using System.Net.Http;
+using Newtonsoft.Json;
+using RestSharp;
+
 namespace TriThucOnline_TTN.Controllers
 {
     [Authorize]
@@ -17,15 +21,61 @@ namespace TriThucOnline_TTN.Controllers
         SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
         public ActionResult Index(int? page)
         {
+            Categories categories = null;
+            string data = "";
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("https://bookstore-api-v1.herokuapp.com/api/v1/");
+
+                //get
+                var responseTask = client.GetAsync("categories?name");
+                responseTask.Wait();
+
+                var result = responseTask.Result;
+                if (result.IsSuccessStatusCode)
+                {
+                    var readTask = result.Content.ReadAsStringAsync();
+                    readTask.Wait();
+
+                    data = readTask.Result;
+                    categories = JsonConvert.DeserializeObject<Categories>(data);
+                    
+                    //ViewBag.CacTheLoai = categories.categories;
+                }
+            }
+
             int pageNumber = (page ?? 1);
             int pageSize = 10;
-            return View(db.THELOAIs.ToList().OrderBy(n => n.TenTL).ToPagedList(pageNumber, pageSize));
+            return View(categories.categories.OrderBy(n => n.name).ToPagedList(pageNumber, pageSize));
         }
         public PartialViewResult IndexPartial(int ? page)
         {
-            int pageNumber = ( page ?? 1);
+            Categories categories = null;
+            string data = "";
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("https://bookstore-api-v1.herokuapp.com/api/v1/");
+
+                //get
+                var responseTask = client.GetAsync("categories?name");
+                responseTask.Wait();
+
+                var result = responseTask.Result;
+                if (result.IsSuccessStatusCode)
+                {
+                    var readTask = result.Content.ReadAsStringAsync();
+                    readTask.Wait();
+
+                    data = readTask.Result;
+                    categories = JsonConvert.DeserializeObject<Categories>(data);
+
+                    //ViewBag.CacTheLoai = categories.categories;
+                }
+            }
+
+            int pageNumber = (page ?? 1);
             int pageSize = 10;
-            return PartialView(db.THELOAIs.ToList().OrderBy(n => n.TenTL).ToPagedList(pageNumber, pageSize));
+            return PartialView(categories.categories.OrderBy(n => n.name).ToPagedList(pageNumber, pageSize));
         }
         /// <summary>
         /// Tao moi
@@ -86,33 +136,27 @@ namespace TriThucOnline_TTN.Controllers
             return RedirectToAction("Index");
 
         }
-
-        [HttpPost]
-        public JsonResult XemCTCD(int macd)
-        {
-            TempData["macd"] = macd;
-            return Json(new { Url = Url.Action("XemCTCDPartial") });
-        }
-        public PartialViewResult XemCTCDPartial()
-        {
-            int maCD = (int)TempData["macd"];
-            var lstCD = db.THELOAIs.Where(n => n.MaTL == maCD).ToList();
-            return PartialView(lstCD);
-        }
         
         /////////////////////
         [HttpPost]
         public JsonResult Remove(int id)
         {
-            THELOAI cd = db.THELOAIs.SingleOrDefault(n => n.MaTL == id);
-            if (cd == null)
+            // GET
+            Extensions.request = new RestRequest($"categories/{id}", Method.DELETE);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                Response.StatusCode = 404;
+                return Json(new { Url = Url.Action("IndexPartial") });
+            }
+            else
+            {
+                Response.StatusCode = 500;
                 return null;
             }
-            db.THELOAIs.Remove(cd);
-            db.SaveChanges();
-            return Json(new { Url = Url.Action("IndexPartial") });
         }
 
     }
