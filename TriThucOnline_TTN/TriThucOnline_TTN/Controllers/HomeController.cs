@@ -36,14 +36,14 @@ namespace TriThucOnline_TTN.Controllers
             //ViewBag.SachMoi = dausach;
             ///// sách bán chạy 
             //ViewBag.SachBanChay = dausach;
-            List<Publisher> publishers = null;
+            List<Category> categories = null;
             string jsonData = "";
             using( var client = new HttpClient())
             {
                 client.BaseAddress = new Uri("https://bookstore-api-v1.herokuapp.com/api/v1/");
 
                 //get
-                var responseTask = client.GetAsync("publishers?name");
+                var responseTask = client.GetAsync("categories?name");
                 responseTask.Wait();
 
                 var result = responseTask.Result;
@@ -53,9 +53,9 @@ namespace TriThucOnline_TTN.Controllers
                     readTask.Wait();
 
                     jsonData = readTask.Result;
-                    Publishers listPublisher = JsonConvert.DeserializeObject<Publishers>(jsonData);
-                    int hello = listPublisher.publishers.Count;
-                    ViewBag.CacTheLoai = listPublisher.publishers;
+                    Categories listCategory = JsonConvert.DeserializeObject<Categories>(jsonData);
+                    int hello = listCategory.categories.Count;
+                    ViewBag.CacTL = listCategory.categories;
                     //publishers = listPublisher;
                 }
             }
@@ -66,21 +66,46 @@ namespace TriThucOnline_TTN.Controllers
         {
             return PartialView("_Paging");
         }
-        public ActionResult Detail(int? MaTL)
+        public ActionResult Detail(int id)
         {
-            ViewBag.TenKhoaHoc = db.THELOAIs.Find(MaTL).TenTL;
-            List<DAUSACH> Sach = db.DAUSACHes.Where(x => x.MaTL == MaTL).ToList();
-            return PartialView(Sach);
+            List<Books> books = null;
+            string jsonData = "";
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("https://bookstore-api-v1.herokuapp.com/api/v1/");
+
+                //get
+                var responseTask = client.GetAsync($"publishers/{id}");
+                responseTask.Wait();
+
+                var result = responseTask.Result;
+                if (result.IsSuccessStatusCode)
+                {
+                    var readTask = result.Content.ReadAsStringAsync();
+                    readTask.Wait();
+
+                    jsonData = readTask.Result;
+                    Publisher publisher = JsonConvert.DeserializeObject<Publisher>(jsonData);
+
+                    ViewBag.ListBooks = publisher.books;
+                    //publishers = listPublisher;
+                }
+            }
+
+
+            //ViewBag.TenKhoaHoc = db.THELOAIs.Find(MaTL).TenTL;
+            //List<DAUSACH> Sach = db.DAUSACHes.Where(x => x.MaTL == MaTL).ToList();
+            return PartialView();
         }
 
-        public ActionResult SachMoi()
-        {
-            return PartialView("_PartitalView_SachMoi");
-        }
-        public ActionResult SachBanChay()
-        {
-            return PartialView("_PartitalView_SachBanChay");
-        }
+        //public ActionResult SachMoi()
+        //{
+        //    return PartialView("_PartitalView_SachMoi");
+        //}
+        //public ActionResult SachBanChay()
+        //{
+        //    return PartialView("_PartitalView_SachBanChay");
+        //}
 
         public ActionResult Search(string search = "")
         {

@@ -1,18 +1,18 @@
 ﻿
 
-@model IEnumerable<TriThucOnline_TTN.Models.DAUSACH>
+@*@model IEnumerable<TriThucOnline_TTN.Models.DAUSACH>*@
 
 <section class="center slider" style="">
-    @foreach (var item in Model)
+    @foreach (var item in ViewBag.ListBooks)
     {
         <div style="height:300px">
-            @*<td>@Model.Rows[i][0]</td>*@
-            <a href="@Url.Action("Details", "DAUSACH", new { @id = item.MaSach })">
+            
+            <a href="@Url.Action("Details", "DAUSACH", new { @id = item.id })">
 
-                <img class="pic_book" src="@Url.Content("/Content/HinhAnhSP/" + @item.PicBook)" alt="Alternate Text" />
-                <p class="title_book">@item.TenSach</p>
+                <img class="pic_book" src="@item.picture" alt="Alternate Text" />
+                <p class="title_book">@item.title</p>
             </a>
-            <p class="price_book">@string.Format("{0:0,0}", item.GiaTien)</p>
+            <p class="price_book">@String.Format("{0:0,0}", @item.price)</p>
 
         </div>
     }

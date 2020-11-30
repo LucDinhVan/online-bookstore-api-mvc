@@ -4,6 +4,8 @@ using System.Data;
 using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net.Http;
+using Newtonsoft.Json;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
@@ -24,17 +26,53 @@ namespace TriThucOnline_TTN.Controllers
         // GET: THELOAI/Details/5
         public ActionResult Details(int id)
         {
-            if (id == null)
+            //if (id == null)
+            //{
+            //    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            //}
+            //THELOAI tHELOAI = db.THELOAIs.Find(id);
+            //if (tHELOAI == null)
+            //{
+            //    return HttpNotFound();
+            //}
+            //ViewBag.TenTL = tHELOAI.TenTL;
+            //return View(db.DAUSACHes.Where(temp => temp.MaTL == id).ToList());
+
+
+            List<Category> categories = null;
+            string jsonData = "";
+            using (var client = new HttpClient())
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                client.BaseAddress = new Uri("https://bookstore-api-v1.herokuapp.com/api/v1/");
+
+                //get
+                var responseTask = client.GetAsync("categories/"+id);
+                responseTask.Wait();
+
+                var result = responseTask.Result;
+                if (result.IsSuccessStatusCode)
+                {
+                    var readTask = result.Content.ReadAsStringAsync();
+                    readTask.Wait();
+
+                    jsonData = readTask.Result;
+                    Category category = JsonConvert.DeserializeObject<Category>(jsonData);
+                    ViewBag.CacSachTheoTL = category.books;
+                    ViewBag.TenTL = category.name;
+                    //publishers = listPublisher;
+                }
             }
-            THELOAI tHELOAI = db.THELOAIs.Find(id);
-            if (tHELOAI == null)
-            {
-                return HttpNotFound();
-            }
-            ViewBag.TenTL = tHELOAI.TenTL;
-            return View(db.DAUSACHes.Where(temp => temp.MaTL == id).ToList());
+
+            return View();
+
+
+
+
+
+
+
+
+
         }
 
         protected override void Dispose(bool disposing)

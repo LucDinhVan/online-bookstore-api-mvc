@@ -47,7 +47,7 @@
             <div class="col-lg-3" style="padding-right:0;">
                 <div class="vertical-menu">
                     <h4>Danh Mục Sản Phẩm</h4>
-                    @foreach (var item in ViewBag.CacTheLoai)
+                    @foreach (var item in ViewBag.CacTL)
                     {
                         <a href="@Url.Action("Details", "THELOAI", new { @id = item.id })">@item.name</a>
                     }
@@ -117,14 +117,14 @@
     @{ Html.RenderPartial("_Paging"); }*@
     <hr />
     <div style="margin-top:50px">
-        @foreach (var theloai in ViewBag.CacTheLoai)
+        @foreach (var category in ViewBag.CacTL)
         {
 
-            <h4>@theloai.name</h4>
+            <h4>@category.name</h4>
 
             <div>
 
-                    @{Html.RenderAction("Detail", "Home", new { @MaTL = theloai.id });}
+                    @{Html.RenderAction("Detail", "Home", new { @id = category.id });}
 
             </div>
         }
