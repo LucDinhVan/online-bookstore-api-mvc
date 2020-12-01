@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
 using System.Web.Mvc;
-
 using TriThucOnline_TTN.Models;
 using PagedList;
-using PagedList.Mvc;
-using System.Web.Security;
+using Newtonsoft.Json;
+using RestSharp;
 using System.IO;
 
 namespace TriThucOnline_TTN.Controllers
@@ -19,50 +15,91 @@ namespace TriThucOnline_TTN.Controllers
         SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
         public ActionResult Index(int? page)
         {
+            Users users = null;
+            // GET
+
+            Extensions.request = new RestRequest($"users?name", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                users = JsonConvert.DeserializeObject<Users>(result.Content);
+            }
+            else
+            {
+
+            }
             int pageNumber = (page ?? 1);
             int pageSize = 10;
-            return View(db.KHACHHANGs.ToList().OrderBy(n => n.MaKH).ToPagedList(pageNumber, pageSize));
+            return View(users.users.ToList().OrderBy(n => n.id).ToPagedList(pageNumber, pageSize));
         }
         public PartialViewResult IndexPartial(int? page)
         {
+            Users users = null;
+            // GET
+
+            Extensions.request = new RestRequest($"users?name", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                users = JsonConvert.DeserializeObject<Users>(result.Content);
+            }
+            else
+            {
+
+            }
             int pageNumber = (page ?? 1);
             int pageSize = 10;
-            return PartialView(db.KHACHHANGs.ToList().OrderBy(n => n.MaKH).ToPagedList(pageNumber, pageSize));
+            return PartialView(users.users.ToList().OrderBy(n => n.id).ToPagedList(pageNumber, pageSize));
         }
         
-        [HttpPost]
-        public JsonResult XemCTKH(int makh)
+        public PartialViewResult XemCTKHPartial(int? id)
         {
-            TempData["makh"] = makh;
-            return Json(new { Url = Url.Action("XemCTKHPartial") });
-        }
-        public PartialViewResult XemCTKHPartial()
-        {
-            int maKH = (int)TempData["makh"];
-            var lstKH = db.KHACHHANGs.Where(n => n.MaKH == maKH).ToList();
-            return PartialView(lstKH);
+            User user = null;
+            // GET
+
+            Extensions.request = new RestRequest($"user/{id}", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                user = JsonConvert.DeserializeObject<User>(result.Content);
+            }
+            else
+            {
+
+            }
+            return PartialView(user);
         }
 
         [HttpPost]
         public JsonResult Remove(int id)
         {
-            KHACHHANG kh = db.KHACHHANGs.SingleOrDefault(n => n.MaKH == id);
-            if (kh == null)
+            Extensions.request = new RestRequest($"user/{id}", Method.DELETE);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                Response.StatusCode = 404;
+                return Json(new { Url = Url.Action("IndexPartial") });
+            }
+            else
+            {
+                Response.StatusCode = 500;
                 return null;
             }
-            if (kh.PicUser != null)
-            {
-                var path = Path.Combine(Server.MapPath("~/Content/HinhAnhKH"), kh.PicUser);
-                if (System.IO.File.Exists(path))
-                {
-                    System.IO.File.Delete(path);
-                }
-            }
-            db.KHACHHANGs.Remove(kh);
-            db.SaveChanges();
-            return Json(new { Url = Url.Action("IndexPartial") });
         }
 
         [HttpPost]

@@ -3,6 +3,7 @@
     ViewBag.Title = "Quản lý sách";
     Layout = "~/Views/Shared/_LayoutAmin.cshtml";
 }
+
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="~/Content/bootstrap.min.css">
 <link rel="stylesheet" href="~/Content/Register/css/style.css">
@@ -108,6 +109,101 @@
                 float: right;
             }
 
+    .modal-confirm-delete {
+        color: #636363;
+        width: 400px;
+        margin: 30px auto;
+    }
+
+        .modal-confirm-delete .modal-content {
+            padding: 20px;
+            border-radius: 5px;
+            border: none;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .modal-confirm-delete .modal-header {
+            border-bottom: none;
+            position: relative;
+        }
+
+        .modal-confirm-delete h4 {
+            text-align: center;
+            font-size: 26px;
+            margin: 30px 0 -10px;
+        }
+
+        .modal-confirm-delete .close {
+            position: absolute;
+            top: -5px;
+            right: -2px;
+        }
+
+        .modal-confirm-delete .modal-body {
+            color: #999;
+        }
+
+        .modal-confirm-delete .modal-footer {
+            border: none;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 13px;
+            padding: 10px 15px 25px;
+        }
+
+            .modal-confirm-delete .modal-footer a {
+                color: #999;
+            }
+
+        .modal-confirm-delete .icon-box {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            border-radius: 50%;
+            z-index: 9;
+            text-align: center;
+            border: 3px solid #f15e5e;
+        }
+
+            .modal-confirm-delete .icon-box i {
+                color: #f15e5e;
+                font-size: 46px;
+                display: inline-block;
+                margin-top: 13px;
+            }
+
+        .modal-confirm-delete .btn {
+            color: #fff;
+            border-radius: 4px;
+            background: #60c7c1;
+            text-decoration: none;
+            transition: all 0.4s;
+            line-height: normal;
+            min-width: 120px;
+            border: none;
+            min-height: 40px;
+            border-radius: 3px;
+            margin: 0 5px;
+            outline: none !important;
+        }
+
+        .modal-confirm-delete .btn-info {
+            background: #c1c1c1;
+        }
+
+            .modal-confirm-delete .btn-info:hover, .modal-confirm .btn-info:focus {
+                background: #a8a8a8;
+            }
+
+        .modal-confirm-delete .btn-danger {
+            background: #f15e5e;
+        }
+
+            .modal-confirm-delete .btn-danger:hover, .modal-confirm .btn-danger:focus {
+                background: #ee3535;
+            }
+
     .trigger-btn {
         display: inline-block;
         margin: 100px auto;
@@ -127,7 +223,7 @@
 
 <p>
     @*@Html.ActionLink("Thêm mới sách", "ThemMoi")*@
-    <a href="@Url.Action("ThemMoi")" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i> Thêm sách</a>
+    <button onclick="create()" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i> Thêm sách</button>
     <div class="form-inline">
         <input class="form-control mr-sm-2" type="search" name="search" id="search" value="@ViewBag.search" placeholder="Tên sách ...">
 
@@ -136,120 +232,61 @@
 
 </p>
 <div id="Books">
-    <div class="table-responsive">
-        <table class="table table-condensed table-bordered table-striped table-hover">
-            <thead>
-                <tr>
-                    <th width="80">
-                        <span class="text-primary">Mã</span>
-                    </th>
-                    <th>
-                        <span class="text-primary">Tên sách</span>
-
-                    </th>
-                    <th>
-                        <span class="text-primary">Ảnh bìa</span>
-
-                    </th>
-                    <th>
-                        <span class="text-primary">Số lượng tồn</span>
-
-                    </th>
-                    <th>
-                        <span class="text-primary">Thể loại</span>
-
-                    </th>
-                    <th>
-                        <span class="text-primary">NXB</span>
-
-                    </th>
-                    <th><span class="text-primary">Chức năng</span></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.items)
-                {
-                    <tr>
-                        <td width="80">
-                            @item.id
-                        </td>
-                        <td width="200">
-                            @item.title
-                        </td>
-                        <td>
-                            <div id="AnhBia">
-                                <img src="@item.picture" class="img-responsive" style="width: 150px; height: auto" />
-                            </div>
-                        </td>
-                        <td>
-                            @item.quantity
-                        </td>
-                        <td>
-                            @item.category_name
-                        </td>
-                        <td>
-                            @item.publisher_name
-                        </td>
-                        <td>
-                            @*@Html.ActionLink("Chỉnh sửa", "ChinhSua", new { @MaSach = item.MaSach }) |
-                                @Html.ActionLink("Hiển thị", "HienThi", new { @MaSach = item.MaSach }) |
-                                @Html.ActionLink("Xoa", "Xoa", new { @MaSach = item.MaSach })*@
-
-                            <a href="/QuanLySach/ChinhSua?MaSach=@item.id"><i class="far fa-edit"></i></a>
-                            @*<a href="/QuanLySach/HienThi?MaSach=@item.MaSach" class="btn btn-primary btn-sm btn-color-primary"><i class="glyphicon glyphicon-eye-open"></i></a>*@
-                            <button onclick="ChiTietSach('@item.id')"><i class="fas fa-info-circle"></i></button>
-                            <button onclick="delete_article('@item.id')"><i class="far fa-trash-alt" style="color:red"></i></button>
-
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-    Trang @Model.page/@Model.pages
-    <div class="MenuTrang">
-        <ul class="pagination">
-            @for (var i = 1; i <= Model.pages; i++)
-            {
-                <li class="page-item @(i == Model.page ? "active" : "")">
-                    <a class="page-link" onclick="NextPage(@i)">@i</a>
-                </li>
-            }
-        </ul>
-    </div>
-
+    @{ Html.RenderPartial("IndexPartial");}
 </div>
-
 @* Tạo link liên kết các trang*@
 
 
 <script>
-    function delete_article(Id) {
-        var answer = confirm("Bạn có chắc muốn xóa sách này?");
-        if (answer) {
+    function delete_article(Id, pageNumber) {
+        $("#confirmModal").modal();
+        $('#submit-del').click(function () {
             //alert('Xác nhận xóa');
-            Remove(Id);
-        }
+            $("#confirmModal").modal('hide');
+            Remove(Id, pageNumber);
+        });
     }
 
-    function Remove(Id) {
+    function create() {
+        $("#addModal").modal();
+    }
+
+    function edit(...params) {
+        $("#editModal .modal-body #name").val(params[1]);
+        $("#editModal .modal-body #id").val(params[0]);
+        $("#editModal .modal-body #price").val(params[2]);
+        $("#editModal .modal-body #publish_year").val(params[3]);
+        $("#editModal .modal-body #picture").val(params[4]);
+        $("#editModal .modal-body #page_number").val(params[5]);
+        $("#editModal .modal-body #quantity").val(params[6]);
+        $("#editModal .modal-body #quotes_about").val(params[7]);
+        $("#editModal .modal-body #author_id").val(params[8]);
+        $("#editModal .modal-body #publisher_id").val(params[9]);
+        $("#editModal .modal-body #category_id").val(params[10]);
+        $("#editModal").modal();
+    }
+
+    function Remove(Id, pageNumber) {
         $.ajax({
             type: 'POST',
             url: '/QuanLySach/Remove',
             data: { id: Id },
             success: function (data) {
                 $("#deletedModal").modal();
-                $.post(data.Url, function (partial) {
-                    $("#Xoa_Sach").html(partial);
+                $.get(data.Url + "?page=" + pageNumber, function (partial) {
+                    $("#Books").html(partial);
                 });
+            },
+            error: function () {
+                alert("Đã có lỗi xảy ra khi xóa");
             }
         });
     }
 
-    function NextPage(page) {
+    function NextPage(page, sort_by) {
         $.ajax({
             type: 'GET',
-            url: '/QuanLySach/IndexPartial?page=' + page,
+            url: '/QuanLySach/IndexPartial?page=' + page+'&sort_by='+sort_by,
             success: function (data) {
                 $("#Books").html(data);
             }
@@ -261,7 +298,7 @@
             type: 'GET',
             url: '/QuanLySach/XemCTSACHPartial?id=' + id,
             success: function (data) {
-                $("#All_Dialog").html(partial)
+                $("#All_Dialog").html(data)
             }
         });
         $('#myModal').on('shown.bs.modal', function () {
@@ -275,31 +312,117 @@
         $("#myModal").modal();
     }
     function Search(keyword) {
-        $.ajax({
-            type: 'GET',
-            url: '/QuanLySach/Search',
-            data: { search: keyword },
-            success: function (data) {
-                $("#Xoa_Sach").html(data);
-            },
-            error: function () {
-                alert("Đã có lỗi xảy ra khi xóa");
-            }
-        });
+        if (keyword == '') NextPage(1)
+        else {
+            $.ajax({
+                type: 'GET',
+                url: '/QuanLySach/Search',
+                data: { keyword: keyword },
+                success: function (data) {
+                    $("#Books").html(data);
+                },
+                error: function () {
+                    alert("Đã có lỗi xảy ra khi truy vấn");
+                }
+            });
+        }
     }
     $(document).ready(function () {
+        $("#editForm").submit(function(e) {
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+
+            var form = $(this);
+            var url = form.attr('action');
+            $("#editModal").modal('hide');
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: form.serialize(), // serializes the form's elements.
+                success: function(data)
+                {
+                    $("#deletedModal").modal();
+                    $.get(data.Url + "?page=" + pageNumber, function (partial) {
+                        $("#Books").html(partial);
+                    });
+                },
+                error: function(){
+                    alert("Đã có lỗi xảy ra khi truy vấn");
+                }
+            });
+
+            
+        });
+        $("#addForm").submit(function(e) {
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+
+            var form = $(this);
+            var url = form.attr('action');
+            $("#addModal").modal('hide');
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: form.serialize(), // serializes the form's elements.
+                success: function(data)
+                {
+                    $("#deletedModal").modal();
+                    $.get(data.Url + "?page=" + pageNumber, function (partial) {
+                        $("#Books").html(partial);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    alert("Đã có lỗi xảy ra khi truy vấn ");
+                }
+            });
+
+            
+        });
+        $.ajax({
+            type: "GET",
+            url: 'https://bookstore-api-v1.herokuapp.com/api/v1/authors?name',
+            success: function(data)
+            {
+                
+                data.authors.forEach(element => {
+                    $("#editModal .modal-body #author_id").append('<option value="' + element.id + '">' + element.name + '</option>');                    
+                    $("#addModal .modal-body #author_id").append('<option value="' + element.id + '">' + element.name + '</option>');                    
+                }); 
+            }
+        });
+         $.ajax({
+            type: "GET",
+            url: 'https://bookstore-api-v1.herokuapp.com/api/v1/publishers?name',
+            success: function(data)
+            {
+                
+                data.publishers.forEach(element => {
+                    $("#editModal .modal-body #publisher_id").append('<option value="' + element.id + '">' + element.name + '</option>');                    
+                    $("#addModal .modal-body #publisher_id").append('<option value="' + element.id + '">' + element.name + '</option>');                    
+                }); 
+            }
+        });
+         $.ajax({
+            type: "GET",
+            url: 'https://bookstore-api-v1.herokuapp.com/api/v1/categories?name',
+            success: function(data)
+            {
+                
+                data.categories.forEach(element => {
+                    $("#editModal .modal-body #category_id").append('<option value="' + element.id + '">' + element.name + '</option>');                    
+                    $("#addModal .modal-body #category_id").append('<option value="' + element.id + '">' + element.name + '</option>');                    
+                }); 
+            }
+        });
         $("html, body").animate({ scrollTop: 0 }, 500);
         $('.MenuTrang').find('li').addClass('page-item');
         $('.MenuTrang').find('li').find('a').addClass('page-link');
     })
 </script>
-@* đây là cái bảng dialog *@
 <div id="myModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Chi tiết sách</h4>
+                <h4 class="modal-title">Chi tiết nhà xuất bản</h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
@@ -312,7 +435,8 @@
             </div>
         </div>
     </div>
-</div>    <!-- Modal HTML -->
+</div>
+<!-- Deleted Modal HTML -->
 <div id="deletedModal" class="modal fade">
     <div class="modal-dialog modal-confirm">
         <div class="modal-content">
@@ -323,9 +447,155 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             </div>
             <div class="modal-body text-center">
-                <h4>Đã xóa!</h4>
-                <p>Đã xóa thành công</p>
+                <h4>Thành công!</h4>
+                <p>Đã cập nhật thành công</p>
             </div>
         </div>
     </div>
-</div>    
+</div>
+<!-- Delete Confirm Modal HTML -->
+<div id="confirmModal" class="modal fade">
+    <div class="modal-dialog modal-confirm-delete">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="icon-box">
+                    <i class="material-icons">&#xE5CD;</i>
+                </div>
+                <h4 class="modal-title">Bạn có chắc xóa?</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có thực sự muốn xóa các bản ghi này không? Không thể hoàn tác quá trình này.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="submit-del">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Add Modal HTML -->
+<div id="addModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="addForm" action="/QuanLySach/Add">
+                <div class="modal-header">
+                    <h4 class="modal-title">Thêm sách</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Tên sách</label>
+                        <input type="text" class="form-control" name="name" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Giá tiền</label>
+                        <input type="number" min="1" class="form-control" name="price" id="price" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Năm xuất bản</label>
+                        <input type="number" min="1" max="99999" class="form-control" name="publish_year" id="publish_year">
+                    </div>
+                    <div class="form-group">
+                        <label>Ảnh bìa sách</label>
+                        <input type="text" class="form-control" name="picture" id="picture">
+                    </div>
+                    <div class="form-group">
+                        <label>Số trang sách</label>
+                        <input type="number" min="1" max="99999" class="form-control" name="page_number" id="page_number">
+                    </div>
+                    <div class="form-group">
+                        <label>Số lượng sách</label>
+                        <input type="number" min="1" max="99999" class="form-control" name="quantity" id="quantity" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Trích dẫn trong sách</label>
+                        <textarea class="form-control" name="quotes_about" id="quotes_about" rows="4" cols="50"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Tác giả</label>
+                        <select type="text" class="form-control" name="author_id" id="author_id" required>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nhà xuất bản</label>
+                        <select type="text" class="form-control" name="publisher_id" id="publisher_id" required>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Thể loại</label>
+                        <select type="text" class="form-control" name="category_id" id="category_id" required>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
+                    <input type="submit" class="btn btn-info" value="Lưu">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Edit Modal HTML -->
+<div id="editModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editForm" action="/QuanLySach/Update">
+                <div class="modal-header">
+                    <h4 class="modal-title">Chỉnh sửa sách</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="id" name="id" hidden>
+                    <div class="form-group">
+                        <label>Tên sách</label>
+                        <input type="text" class="form-control" name="name" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Giá tiền</label>
+                        <input type="number" min="1" class="form-control" name="price" id="price" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Năm xuất bản</label>
+                        <input type="number" min="1" max="99999" class="form-control" name="publish_year" id="publish_year">
+                    </div>
+                    <div class="form-group">
+                        <label>Ảnh bìa sách</label>
+                        <input type="text" class="form-control" name="picture" id="picture">
+                    </div>
+                    <div class="form-group">
+                        <label>Số trang sách</label>
+                        <input type="number" min="1" max="99999" class="form-control" name="page_number" id="page_number">
+                    </div>
+                    <div class="form-group">
+                        <label>Số lượng sách</label>
+                        <input type="number" min="1" max="99999" class="form-control" name="quantity" id="quantity" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Trích dẫn trong sách</label>
+                        <textarea class="form-control" name="quotes_about" id="quotes_about" rows="4" cols="50"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Tác giả</label>
+                        <select type="text" class="form-control" name="author_id" id="author_id" required>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nhà xuất bản</label>
+                        <select type="text" class="form-control" name="publisher_id" id="publisher_id" required>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Thể loại</label>
+                        <select type="text" class="form-control" name="category_id" id="category_id" required>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
+                    <input type="submit" class="btn btn-info" value="Lưu">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

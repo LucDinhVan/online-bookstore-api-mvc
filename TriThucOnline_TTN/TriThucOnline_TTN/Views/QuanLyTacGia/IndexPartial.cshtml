@@ -35,14 +35,13 @@
                         <img src="@item.picture" class="img-responsive" style="width: 150px; height: auto"/>
                      </td>
                     <td>
-                        <a href="@Url.Action("Edit", new { @MaTacGia = item.id })">
+                        <button onclick="edit('@item.id', '@item.name', '@item.picture', '@item.info')" style="color:blue">
                             <i class="far fa-edit"></i>
-                        </a>
-
-                        <a onclick="ChiTietTG('@item.id')">
+                        </button>
+                        <button onclick="ChiTietTG('@item.id')">
                             <i class="fas fa-info-circle"></i>
-                        </a>
-                        <button onclick="delete_article('@item.id')" style="color:red">
+                        </button>
+                        <button onclick="delete_article('@item.id', @Model.PageNumber)" style="color:red">
                             <i class="far fa-trash-alt"></i>
                         </button>
                     </td>

@@ -15,7 +15,6 @@ namespace TriThucOnline_TTN.Controllers
     public class QuanLyNXBController : Controller
     {
         // GET: QuanLyNXB
-        SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
         public ActionResult Index(int? page)
         {
             Publishers publishers = null;
@@ -63,67 +62,6 @@ namespace TriThucOnline_TTN.Controllers
             int pageSize = 10;
             return PartialView(publishers.publishers.ToList().OrderBy(n => n.id).ToPagedList(pageNumber, pageSize));
         }
-        /// <summary>
-        /// Tao moi
-        /// </summary>
-        /// <returns></returns>
-        public ActionResult Create()
-        {
-            return View();
-        }
-        [HttpPost]
-        [ValidateInput(false)]
-        public ActionResult Create(NXB nxb)
-        {
-            //Thêm vào cơ sở dữ liệu
-            if (ModelState.IsValid)
-            {
-                db.NXBs.Add(nxb);
-                db.SaveChanges();
-                ViewBag.ThongBao = "Thêm mới thành công";
-            }
-            else
-            {
-                ViewBag.ThongBao = "Thêm mới thất bại";
-                return View(nxb);
-            }
-            return RedirectToAction("Index", new { page = db.NXBs.Count() / 10 });
-        }
-
-        [HttpGet]
-        public ActionResult Edit(int MaNXB)
-        {
-            //Lấy ra đối tượng sách theo mã 
-            NXB nxb = db.NXBs.SingleOrDefault(n => n.MaNXB == MaNXB);
-            if (nxb == null)
-            {
-                Response.StatusCode = 404;
-                return null;
-            }
-
-            return View(nxb);
-        }
-        [HttpPost]
-        [ValidateInput(false)]
-        public ActionResult Edit(NXB nxb, FormCollection f)
-        {
-            //Thêm vào cơ sở dữ liệu
-            if (ModelState.IsValid)
-            {
-                //Thực hiện cập nhận trong model
-                db.Entry(nxb).State = System.Data.Entity.EntityState.Modified;
-                db.SaveChanges();
-            }
-            else
-            {
-                ViewBag.ThongBao = "Lỗi";
-                return View(nxb);
-            }
-
-            return RedirectToAction("Index");
-
-        }
-
         public PartialViewResult XemCTNXBPartial(int? id)
         {
             Publisher publisher = null;

@@ -59,10 +59,15 @@
                             @Html.ActionLink("Hiển thị", "HienThi", new { @MaSach = item.MaSach }) |
                             @Html.ActionLink("Xoa", "Xoa", new { @MaSach = item.MaSach })*@
 
-                        <a href="/QuanLySach/ChinhSua?MaSach=@item.id"><i class="far fa-edit"></i></a>
-                        @*<a href="/QuanLySach/HienThi?MaSach=@item.MaSach" class="btn btn-primary btn-sm btn-color-primary"><i class="glyphicon glyphicon-eye-open"></i></a>*@
-                        <button onclick="ChiTietSach('@item.id')"><i class="fas fa-info-circle"></i></button>
-                        <button onclick="delete_article('@item.id')"><i class="far fa-trash-alt" style="color:red"></i></button>
+                        <button onclick="edit('@item.id', '@item.title','@item.price','@item.publish_year','@item.picture','@item.page_number','@item.quantity','@item.quotes_about','@item.author_id','@item.publisher_id','@item.category_id')" style="color:blue">
+                            <i class="far fa-edit"></i>
+                        </button>
+                        <button onclick="ChiTietSach('@item.id')">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                        <button onclick="delete_article('@item.id', @Model.page)" style="color:red">
+                            <i class="far fa-trash-alt"></i>
+                        </button>
 
                     </td>
                 </tr>
@@ -82,6 +87,7 @@
         </ul>
     </div>
     <script>
+        var pageNumber = @Model.page
         $(document).ready(function () {
             $("html, body").animate({ scrollTop: 0 }, 500);
             $('.MenuTrang').find('li').addClass('page-item');

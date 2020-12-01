@@ -108,8 +108,8 @@ namespace TriThucOnline_TTN.Models
         public float discount { get; set;}
         public float max_value { get; set;}
         public int? count { get; set;}
-        public float valid_from { get; set;}
-        public float valid_until { get; set;}
+        public string valid_from { get; set;}
+        public string valid_until { get; set;}
         public bool is_enable { get; set; }
     }
 

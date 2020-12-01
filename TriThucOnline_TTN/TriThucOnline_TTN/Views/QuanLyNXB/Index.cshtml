@@ -266,7 +266,7 @@
                 success: function (data) {
                     $("#deletedModal").modal();
                     location.reload();
-                    $.post(data.Url + "/?page=" + pageNumber, function (partial) {
+                    $.get(data.Url + "/?page=" + pageNumber, function (partial) {
                         $("#Publishers").html(partial);
                     });
                 },
@@ -288,7 +288,7 @@
                 success: function (data) {
                     $("#deletedModal").modal();
                     location.reload();
-                    $.post(data.Url + "/?page=" + pageNumber, function (partial) {
+                    $.get(data.Url + "/?page=" + pageNumber, function (partial) {
                         $("#Publishers").html(partial);
                     });
                 },
@@ -313,7 +313,7 @@
                 success: function (data) {
                     $("#deletedModal").modal();
                     location.reload();
-                    $.post(data.Url + "/?page=" + pageNumber, function (partial) {
+                    $.get(data.Url + "/?page=" + pageNumber, function (partial) {
                         $("#Publishers").html(partial);
                     });
                 },
@@ -413,23 +413,11 @@
 						<div class="form-group">
 							<label>Tên NXB</label>
 							<input type="text" class="form-control" id="name" required>
-						</div>
-						<div class="form-group">
-							<label>Email</label>
-							<input type="email" class="form-control" required>
-						</div>
-						<div class="form-group">
-							<label>Address</label>
-							<textarea class="form-control" required></textarea>
-						</div>
-						<div class="form-group">
-							<label>Phone</label>
-							<input type="text" class="form-control" required>
-						</div>					
+						</div>				
 					</div>
 					<div class="modal-footer">
-						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-						<input type="button" onclick="add()" class="btn btn-success" value="Add">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">
+						<input type="button" onclick="add()" class="btn btn-success" value="Thêm">
 					</div>
 				</form>
 			</div>
@@ -449,19 +437,7 @@
 						<div class="form-group">
 							<label>Tên NXB</label>
 							<input type="text" class="form-control" id="name" required>
-						</div>
-						<div class="form-group">
-							<label>Email</label>
-							<input type="email" class="form-control" required>
-						</div>
-						<div class="form-group">
-							<label>Address</label>
-							<textarea class="form-control" required></textarea>
-						</div>
-						<div class="form-group">
-							<label>Phone</label>
-							<input type="text" class="form-control" required>
-						</div>					
+						</div>			
 					</div>
 					<div class="modal-footer">
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Hủy">

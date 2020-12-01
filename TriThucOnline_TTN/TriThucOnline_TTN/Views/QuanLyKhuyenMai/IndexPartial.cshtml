@@ -1,6 +1,6 @@
 ﻿@using PagedList.Mvc;
 @using PagedList;
-@model PagedList.PagedList<TriThucOnline_TTN.Models.KHUYENMAI>
+@model PagedList.PagedList<TriThucOnline_TTN.Models.Coupon>
 
 <div class="table-responsive">
     <table class="table table-condensed table-bordered table-striped table-hover">
@@ -23,20 +23,29 @@
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.MaKM)
+                        @Html.DisplayFor(modelItem => item.code)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.GiaTriKM)
+                        @Html.DisplayFor(modelItem => item.discount)
                     </td>
                     <td>
-                        <a href="@Url.Action("Edit", new { @VoucherCode = item.MaKM })">
+                    @if(item.is_enable)
+                    {
+                        <button onclick="edit('@item.code', '@item.description','@item.discount','@item.max_value','@item.count','@item.valid_from','@item.valid_until','1')" style="color:blue">
                             <i class="far fa-edit"></i>
-                        </a>
-                    
-                        <a onclick="ChiTietKM('@item.MaKM')">
+                        </button>
+                    }
+                    else
+                    {
+                        <button onclick="edit('@item.code', '@item.description','@item.discount','@item.max_value','@item.count','@item.valid_from','@item.valid_until','0')" style="color:blue">
+                            <i class="far fa-edit"></i>
+                        </button>
+                    }
+                        
+                        <button onclick="ChiTietKM('@item.code')">
                             <i class="fas fa-info-circle"></i>
-                        </a>
-                        <button onclick="delete_article('@item.MaKM')" style="color:red">
+                        </button>
+                        <button onclick="delete_article('@item.code')" style="color:red">
                             <i class="far fa-trash-alt"></i>
                         </button>
                     </td>

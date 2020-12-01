@@ -21,23 +21,31 @@
         <tbody>
             @foreach (var item in Model)
             {
-            <tr>
-                <td>
-                    @item.id
-                </td>
-                <td>
-                    @item.name
-                </td>
-                <td>
-                    <a href="@Url.Action("Edit", new { @MaTheLoai = item.id })">
-                        <i class="far fa-edit"></i>
-                    </a>
-                    <button onclick="delete_article('@item.id')" style="color:red">
-                        <i class="far fa-trash-alt"></i>
-                    </button>
-                </td>
-            </tr>
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.name)
+                    </td>
+                    <td>
+                        <!-- <a href="@Url.Action("Edit", new { @MaNXB = item.id })">
+                            <i class="far fa-edit"></i>
+                        </a> -->
+                        <button onclick="edit('@item.id', '@item.name')" style="color:blue">
+                            <i class="far fa-edit"></i>
+                        </button>
+                        <button onclick="ChiTietTheLoai('@item.id')">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                        <button onclick="delete_article('@item.id', @Model.PageNumber)" style="color:red">
+                            <i class="far fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
             }
+
+           
         </tbody>
     </table>
 </div>

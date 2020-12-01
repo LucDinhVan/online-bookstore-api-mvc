@@ -1,5 +1,5 @@
 ﻿@using TriThucOnline_TTN.Models;
-@model List<TACGIA>
+@model Author
 
 <table class="table table-bordered table-hover table-condensed table-striped">
     <thead>
@@ -7,20 +7,18 @@
             <th>Mã tác giả:</th>
             <th>Tên tác giả:</th>
             <th>Ảnh tác giả:</th>
-
+            <th>Thông tin tác giả:</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
-        {
         <tr>
-            <td>@item.MaTG</td>
-            <td>@item.TenTG</td>
+            <td>@Model.id</td>
+            <td>@Model.name</td>
             <td>
-                <img src="@Url.Content("~/Content/HinhAnhTG/"+item.PicTG)" style="width: 150px; height: auto">
+                <img src="@Model.picture" style="width: 150px; height: auto">
             </td>
+            <td>@Model.info</td>
         </tr>
-        }
     </tbody>
 </table>
 

@@ -15,7 +15,6 @@ namespace TriThucOnline_TTN.Controllers
     public class QuanLySachController : Controller
     {
         // GET: QuanLyDAUSACH
-        SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
 
         public ActionResult Index(int? page)
         {
@@ -40,22 +39,29 @@ namespace TriThucOnline_TTN.Controllers
 
             return View(books);
         }
-        public PartialViewResult Search(string search, int? nxb, int? tg, int? theloai, int? trichdan)
-        {
-            string query = $"select * from dausach" +
-                $" join nxb on dausach.MaNXB = nxb.MaNXB" +
-                $" join tacgia tg on tg.matg = DAUSACH.MaTG" +
-                $" join theloai tl on tl.MaTL = DAUSACH.matl" +
-                $" where tensach like N'%{search}%' or TrichDan like N'%{search}%' " +
-                $" or tentl like N'%{search}%'" +
-                $" or TenTG like N'%{search}%'" +
-                $" or TenNXB like N'%{search}%'";
 
-            ViewBag.search = search;
-            int pageNumber = 1;
+        public PartialViewResult Search(int? page, string keyword)
+        {
+            Books books = null;
+            int pageNumber = (page ?? 1);
+            // GET
+
+            Extensions.request = new RestRequest($"books?q={keyword}&page={pageNumber}", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                books = JsonConvert.DeserializeObject<Books>(result.Content);
+            }
+            else
+            {
+
+            }
             int pageSize = 10;
-            db.DAUSACHes.SqlQuery(query).ToList().ToPagedList(pageNumber, pageSize);
-            return PartialView("IndexPartial", db.DAUSACHes.SqlQuery(query).ToList().ToPagedList(pageNumber, pageSize));
+            return PartialView(books.items.OrderBy(n => n.id).ToPagedList(pageNumber, pageSize));
         }
 
         [HttpGet]
@@ -81,125 +87,6 @@ namespace TriThucOnline_TTN.Controllers
             }
 
             return PartialView(books);
-        }
-        //Thêm mới 
-        [HttpGet]
-        public ActionResult ThemMoi()
-        {
-            DAUSACH sach = new DAUSACH();
-            //Đưa dữ liệu vào dropdownlist
-            ViewBag.MaTL = new SelectList(db.THELOAIs.ToList().OrderBy(n => n.TenTL), "MaTL", "TenTL");
-            ViewBag.MaNXB = new SelectList(db.NXBs.ToList().OrderBy(n => n.TenNXB), "MaNXB", "TenNXB");
-            ViewBag.MaTG = new SelectList(db.TACGIAs.ToList().OrderBy(n => n.TenTG), "MaTG", "TenTG");
-            return View(sach);
-        }
-        [HttpPost]
-        [ValidateInput(false)]
-        public ActionResult ThemMoi(DAUSACH sach, HttpPostedFileBase fileUpload)
-        {
-
-
-            //Đưa dữ liệu vào dropdownlist
-            ViewBag.MaTL = new SelectList(db.THELOAIs.ToList().OrderBy(n => n.TenTL), "MaTL", "TenTL", sach.MaTL);
-            ViewBag.MaNXB = new SelectList(db.NXBs.ToList().OrderBy(n => n.TenNXB), "MaNXB", "TenNXB", sach.MaNXB);
-            ViewBag.MaTG = new SelectList(db.TACGIAs.ToList().OrderBy(n => n.TenTG), "MaTG", "TenTG", sach.MaTG);
-            //kiểm tra đường dẫn ảnh bìa
-            if (fileUpload == null)
-            {
-                ViewBag.ThongBao = "Hãy chọn ảnh bìa!";
-                return View(sach);
-            }
-            //Thêm vào cơ sở dữ liệu
-            if (ModelState.IsValid)
-            {
-                //Lưu tên file
-                var fileName = Path.GetFileName(fileUpload.FileName);
-                //Lưu đường dẫn của file
-                var path = Path.Combine(Server.MapPath("~/Content/HinhAnhSP"), fileName);
-                //Kiểm tra hình ảnh đã tồn tại chưa
-                if (System.IO.File.Exists(path))
-                {
-                    ViewBag.ThongBao = "Hình ảnh đã tồn tại";
-                }
-                else
-                {
-                    fileUpload.SaveAs(path);
-                }
-                sach.PicBook = fileUpload.FileName;
-                db.DAUSACHes.Add(sach);
-                db.SaveChanges();
-            }
-            else
-            {
-                return View(sach);
-            }
-
-            return RedirectToAction("Index");
-            //return View();
-        }
-        //Chỉnh sửa sản phẩm
-        [HttpGet]
-        public ActionResult ChinhSua(int MaSach)
-        {
-
-            //Lấy ra đối tượng sách theo mã 
-            DAUSACH sach = db.DAUSACHes.SingleOrDefault(n => n.MaSach == MaSach);
-            if (sach == null)
-            {
-                Response.StatusCode = 404;
-                return null;
-            }
-            //Đưa dữ liệu vào dropdownlist
-            ViewBag.MaTL = new SelectList(db.THELOAIs.ToList().OrderBy(n => n.TenTL), "MaTL", "TenTL", sach.MaTL);
-            ViewBag.MaNXB = new SelectList(db.NXBs.ToList().OrderBy(n => n.TenNXB), "MaNXB", "TenNXB", sach.MaNXB);
-            ViewBag.MaTG = new SelectList(db.TACGIAs.ToList().OrderBy(n => n.TenTG), "MaTG", "TenTG", sach.MaTG);
-            ViewBag.Moi = sach.Moi;
-            return View(sach);
-        }
-        [HttpPost]
-        [ValidateInput(false)]
-        public ActionResult ChinhSua(DAUSACH sach, HttpPostedFileBase fileUpload)
-        {
-            if (fileUpload != null)
-            {
-                //Lưu tên file
-                var fileName = Path.GetFileName(fileUpload.FileName);
-                //Lưu đường dẫn của file
-                var path = Path.Combine(Server.MapPath("~/Content/HinhAnhSP"), fileName);
-                if (!System.IO.File.Exists(path))
-                {
-                    fileUpload.SaveAs(path);
-                }
-                sach.PicBook = fileName;
-            }
-            //Thêm vào cơ sở dữ liệu
-            if (ModelState.IsValid)
-            {
-                //Thực hiện cập nhận trong model
-                db.Entry(sach).State = System.Data.Entity.EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            //Đưa dữ liệu vào dropdownlist
-            ViewBag.MaTL = new SelectList(db.THELOAIs.ToList().OrderBy(n => n.TenTL), "MaTL", "TenTL", sach.MaTL);
-            ViewBag.MaNXB = new SelectList(db.NXBs.ToList().OrderBy(n => n.TenNXB), "MaNXB", "TenNXB", sach.MaNXB);
-            ViewBag.MaTG = new SelectList(db.TACGIAs.ToList().OrderBy(n => n.TenTG), "MaTG", "TenTG", sach.MaTG);
-            return View(sach);
-        }
-        //Hiển thị sản phẩm
-        public ActionResult HienThi(int MaSach)
-        {
-
-            //Lấy ra đối tượng sách theo mã 
-            DAUSACH sach = db.DAUSACHes.SingleOrDefault(n => n.MaSach == MaSach);
-            if (sach == null)
-            {
-                Response.StatusCode = 404;
-                return null;
-            }
-
-            return View(sach);
-
         }
 
         public PartialViewResult XemCTSACHPartial(int? id)
@@ -228,20 +115,96 @@ namespace TriThucOnline_TTN.Controllers
         [HttpPost]
         public JsonResult Remove(int id)
         {
-            DAUSACH sach = db.DAUSACHes.SingleOrDefault(n => n.MaSach == id);
-            if (sach == null)
+            Extensions.request = new RestRequest($"books/{id}", Method.DELETE);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                Response.StatusCode = 404;
+                return Json(new { Url = Url.Action("IndexPartial") });
+            }
+            else
+            {
+                Response.StatusCode = 500;
                 return null;
             }
-            var path = Path.Combine(Server.MapPath("~/Content/HinhAnhSP"), sach.PicBook);
-            if (System.IO.File.Exists(path))
+        }
+
+        [HttpPost]
+        public JsonResult Update(FormCollection f)
+        {
+            Extensions.request = new RestRequest($"books/{f["id"]}", Method.PUT);
+
+            var data = JsonConvert.SerializeObject(new
             {
-                System.IO.File.Delete(path);
+                title = f["name"],
+                price = f["price"],
+                publish_year = f["publish_year"],
+                picture = f["picture"],
+                page_number = f["page_number"],
+                quantity = f["quantity"],
+                quotes_about = f["quotes_about"],
+                author_id = f["author_id"],
+                publisher_id = f["publisher_id"],
+                category_id = f["category_id"],
+            });
+            Extensions.request.AddParameter("application/json", data, ParameterType.RequestBody);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                return Json(new { Url = Url.Action("IndexPartial") });
             }
-            db.DAUSACHes.Remove(sach);
-            db.SaveChanges();
-            return Json(new { Url = Url.Action("IndexPartial") });
+            else
+            {
+                Response.StatusCode = 500;
+                Response.Write(result.Content);
+                return null;
+            }
+
+        }
+
+        [HttpPost]
+        public JsonResult Add(FormCollection f)
+        {
+            Extensions.request = new RestRequest($"books", Method.POST);
+
+            var data = JsonConvert.SerializeObject(new
+            {
+                title = f["name"],
+                price = f["price"],
+                publish_year = f["publish_year"],
+                picture = f["picture"],
+                page_number = f["page_number"],
+                quantity = f["quantity"],
+                quotes_about = f["quotes_about"],
+                author_id = f["author_id"],
+                publisher_id = f["publisher_id"],
+                category_id = f["category_id"],
+            });
+
+            Extensions.request.AddParameter("application/json", data, ParameterType.RequestBody);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                return Json(new { Url = Url.Action("IndexPartial") });
+            }
+            else
+            {
+                Response.StatusCode = 500;
+                Response.Write(result.Content);
+                return null;
+            }
+
         }
     }
 }
