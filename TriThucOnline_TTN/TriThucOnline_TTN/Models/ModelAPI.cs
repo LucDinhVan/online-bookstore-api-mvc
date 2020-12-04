@@ -106,7 +106,7 @@ namespace TriThucOnline_TTN.Models
         public string code { get; set;}
         public string description { get; set;}
         public float discount { get; set;}
-        public float max_value { get; set;}
+        public float? max_value { get; set;}
         public int? count { get; set;}
         public string valid_from { get; set;}
         public string valid_until { get; set;}

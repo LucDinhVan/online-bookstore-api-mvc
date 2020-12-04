@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<script src="https://momentjs.com/downloads/moment.min.js"></script>
 <style>
     .modal-confirm {
         color: #434e65;
@@ -246,14 +247,16 @@
     }
 
     function edit(...params) {
+        var from = moment(params[4], "DD/MM/YYYY");;
+        var until = moment(params[5], "DD/MM/YYYY");
+        let date = new Date(+from[1], from[2] - 1, +from[0]);
         $("#editModal .modal-body #code").val(params[0]);
         $("#editModal .modal-body #description").val(params[1]);
         $("#editModal .modal-body #discount").val(params[2]);
-        $("#editModal .modal-body #max_value").val(params[3]);
-        $("#editModal .modal-body #count").val(params[4]);
-        $("#editModal .modal-body #valid_from").val(new Date(params[5]).toISOString().slice(0,10));
-        $("#editModal .modal-body #valid_until").val(new Date(params[6]).toISOString().slice(0,10));
-        $("#editModal .modal-body #is_enable").val(params[7]);
+        $("#editModal .modal-body #count").val(params[3]);
+        $("#editModal .modal-body #valid_from").val(from.toDate().toISOString().slice(0,10));
+        $("#editModal .modal-body #valid_until").val(until.toDate().toISOString().slice(0,10));
+        $("#editModal .modal-body #is_enable").val(params[6]);
         $("#editModal").modal();
     }
 
@@ -352,7 +355,7 @@
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Chi tiết nhà xuất bản</h4>
+                <h4 class="modal-title">Chi tiết khuyến mại</h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
@@ -426,10 +429,7 @@
                         <label id="lblDiscount">Giá trị khuyến mãi (%)</label>
                         <input type="number" min="1" max="100" class="form-control" name="discount" id="discount" required>
                     </div>
-                    <div class="form-group">
-                        <label>Giá trị tối đa (vnđ)</label>
-                        <input type="number" min="1" class="form-control" name="max_value" id="max_value">
-                    </div>
+                    <input type="number" min="1" class="form-control" name="max_value" id="max_value" hidden>
                     <div class="form-group">
                         <label>Số lần còn lại</label>
                         <input type="number" min="1" max="99999" class="form-control" name="count" id="count">
@@ -477,10 +477,7 @@
                         <label id="lblDiscount">Giá trị khuyến mãi (%)</label>
                         <input type="number" min="1" max="100" class="form-control" name="discount" id="discount" required>
                     </div>
-                    <div class="form-group">
-                        <label>Giá trị tối đa (vnđ)</label>
-                        <input type="number" min="1" class="form-control" name="max_value" id="max_value">
-                    </div>
+                    <input type="number" min="1" class="form-control" name="max_value" id="max_value" hidden>
                     <div class="form-group">
                         <label>Số lần còn lại</label>
                         <input type="number" min="1" max="99999" class="form-control" name="count" id="count">
