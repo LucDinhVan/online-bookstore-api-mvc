@@ -12,7 +12,6 @@ namespace TriThucOnline_TTN.Controllers
     public class QuanLyKHController : Controller
     {
         // GET: QuanLyKH
-        SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
         public ActionResult Index(int? page)
         {
             Users users = null;
@@ -102,17 +101,26 @@ namespace TriThucOnline_TTN.Controllers
             }
         }
 
-        [HttpPost]
-        public JsonResult XemCTDHKH(int makh)
+        public PartialViewResult XemCTDHKHPartial(int? id)
         {
-            TempData["makh"] = makh;
-            return Json(new { Url = Url.Action("XemCTDHKHPartial") });
-        }
-        public PartialViewResult XemCTDHKHPartial()
-        {
-            int maKH = (int)TempData["makh"];
-            var lstKH = db.DONHANGs.Where(n => n.MaKH == maKH).ToList();
-            return PartialView(lstKH);
+            User user = null;
+            // GET
+
+            Extensions.request = new RestRequest($"user/{id}", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                user = JsonConvert.DeserializeObject<User>(result.Content);
+            }
+            else
+            {
+
+            }
+            return PartialView(user);
         }
     }
 }

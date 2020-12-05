@@ -3,7 +3,7 @@
 <table class="table table-bordered table-hover table-condensed table-striped">
     <thead>
         <tr>
-            <th>Mã khách hàng:</th>
+            <th>Mã:</th>
             <th>Tên khách hàng:</th>
             <th>Ảnh khách hàng:</th>
             <th>SĐT khách hàng:</th>
@@ -14,14 +14,14 @@
     </thead>
     <tbody>
         <tr>
-            <td>@Model.id</td>
+            <td style="width:40px">@Model.id</td>
             <td>@Model.name</td>
             <td>
                 <img src="@Model.picture" class="img-responsive" style="width: 150px; height: auto">
             </td>
             <td>@Model.phone</td>
             <td>@Model.email</td>
-            <td>@Model.address</td>
+            <td style="width:250px">@Model.address</td>
         </tr>
     </tbody>
 </table>

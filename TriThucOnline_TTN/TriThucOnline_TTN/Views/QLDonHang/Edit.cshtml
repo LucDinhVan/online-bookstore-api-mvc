@@ -1,73 +1,90 @@
-﻿@model TriThucOnline_TTN.Models.DONHANG
+﻿@using PagedList.Mvc;
+@using PagedList;
+@model PagedList.PagedList<TriThucOnline_TTN.Models.Order>
 
 @{
-    ViewBag.Title = "Chỉnh sửa Đơn hàng";
+    ViewBag.Title = "Quản lý đơn hàng";
     Layout = "~/Views/Shared/_LayoutAmin.cshtml";
 }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" integrity="sha512-3Epqkjaaaxqq/lt5RLJsTzP6cCIFyipVRcY4BcPfjOiGM1ZyFCv4HHeWS7eCPVaAigY3Ha3rhRgOsWaWIClqQQ==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" integrity="sha512-jx8R09cplZpW0xiMuNFEyJYiGXJM85GUL+ax5G3NlZT3w6qE7QgxR4/KE1YXhKxijdVTDNcQ7y6AJCtSpRnpGg==" crossorigin="anonymous" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js" integrity="sha512-blBYtuTn9yEyWYuKLh8Faml5tT/5YPG0ir9XEABu5YCj7VGr2nb21WPFT9pnP4fcC3y0sSxJR1JqFTfTALGuPQ==" crossorigin="anonymous"></script>
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="~/Content/bootstrap.min.css">
-<link rel="stylesheet" href="~/Content/Register/css/style.css">
-
-<h2>Chỉnh sửa đơn hàng</h2>
-
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
-
-<div class="form-horizontal">
-    <hr />
-    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-    @Html.HiddenFor(model => model.MaDH)
-
-
-    @Html.EditorFor(model => model.MaDH, new { htmlAttributes = new { @class = "form-control", @hidden = "" } })
-
-    <div class="form-group">
-        <label class="control-label col-md-2">Trạng thái thanh toán</label>
-        <div class="col-md-6">
-            @{if (Model.TrangThaiThanhToan.Contains("Đã"))
-                {
-                    <input type="radio" name="TrangThaiThanhToan" id="TrangThaiThanhToan" value="Đã thanh toán" checked /><span> Đã thanh toán</span><br />
-                    <input type="radio" name="TrangThaiThanhToan" id="TrangThaiThanhToan" value="Chưa thanh toán" /><span> Chưa thanh toán</span>
+<div id="jsGrid"></div>
+<script>
+    $(function() {
+        var clients = [
+            { "Name": "Otto Clay", "Age": 25, "Country": 1, "Address": "Ap #897-1459 Quam Avenue", "Married": false },
+            { "Name": "Connor Johnston", "Age": 45, "Country": 2, "Address": "Ap #370-4647 Dis Av.", "Married": true },
+            { "Name": "Lacey Hess", "Age": 29, "Country": 3, "Address": "Ap #365-8835 Integer St.", "Married": false },
+            { "Name": "Timothy Henson", "Age": 56, "Country": 1, "Address": "911-5143 Luctus Ave", "Married": true },
+            { "Name": "Ramona Benton", "Age": 32, "Country": 3, "Address": "Ap #614-689 Vehicula Street", "Married": false }
+        ];
+        var countries = [
+            { Name: "", Id: 0 },
+            { Name: "United States", Id: 1 },
+            { Name: "Canada", Id: 2 },
+            { Name: "United Kingdom", Id: 3 },
+            { Name: "France", Id: 4 },
+            { Name: "Brazil", Id: 5 },
+            { Name: "China", Id: 6 },
+            { Name: "Russia", Id: 7 }
+        ];
+        $("#jsGrid").jsGrid({
+            height: "50%",
+            width: "100%",
+            filtering: true,
+            inserting: true,
+            editing: true,
+            sorting: true,
+            paging: true,
+            autoload: true,
+            pageSize: 10,
+            pageButtonCount: 5,
+            deleteConfirm: "Do you really want to delete client?",
+            controller: {
+                loadData: function(filter) {
+                    return $.ajax({
+                        type: "GET",
+                        url: "/api/data",
+                        data: filter,
+                        dataType: "json"
+                    });
+                },
+                insertItem: function(item) {
+                    return $.ajax({
+                        type: "POST",
+                        url: "/api/data",
+                        data: item,
+                        dataType: "json"
+                    });
+                },
+                updateItem: function(item) {
+                    return $.ajax({
+                        type: "PUT",
+                        url: "/api/data/" + item.ID,
+                        data: item,
+                        dataType: "json"
+                    });
+                },
+                deleteItem: function(item) {
+                    return $.ajax({
+                        type: "DELETE",
+                        url: "/api/data/" + item.ID,
+                        dataType: "json"
+                    });
                 }
-                else
-                {
-                    <input type="radio" name="TrangThaiThanhToan" id="TrangThaiThanhToan" value="Đã thanh toán" /><span> Đã thanh toán</span><br />
-                    <input type="radio" name="TrangThaiThanhToan" id="TrangThaiThanhToan" value="Chưa thanh toán" checked/><span> Chưa thanh toán</span>
-                }
-            }
-            @Html.ValidationMessageFor(model => model.TrangThaiThanhToan, "", new { @class = "text-danger" })
-        </div>
-    </div>
-    
-    <div class="form-group">
-        <span class="control-label col-md-3"><strong>Trạng thái giao</strong></span>
-        <div class="col-md-6">
-            @{if (Model.TrangThaiGiao == 1)
-                {
-                    <input type="radio" name="TrangThaiGiao" id="TrangThaiGiao" value="1" checked /><span> Đã giao</span><br />
-                    <input type="radio" name="TrangThaiGiao" id="TrangThaiGiao" value="0" /><span> Chưa giao</span>
-                }
-                else
-                {
-                    <input type="radio" name="TrangThaiGiao" id="TrangThaiGiao" value="1" /><span> Đã giao</span><br />
-                    <input type="radio" name="TrangThaiGiao" id="TrangThaiGiao" value="0" checked /><span> Chưa giao</span>
-                }
-            }
-            @*@Html.EditorFor(model => model.Moi)
-                @Html.ValidationMessageFor(model => model.Moi)*@
-        </div>
-    </div>
-
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input type="submit" value="Lưu" class="btn btn-warning" />
-        </div>
-    </div>
-</div>
-}
-
-<div>
-    @Html.ActionLink("Trở về", "Index")
-</div>
+            },
+            fields: [
+                { name: "Name", type: "text", width: 150 },
+                { name: "Age", type: "number", width: 50, filtering: false },
+                { name: "Address", type: "text", width: 200 },
+                { name: "Country", type: "select", items: countries, valueField: "Id", textField: "Name" },
+                { name: "Married", type: "checkbox", title: "Is Married", sorting: false },
+                { type: "control" }
+            ],
+            data: clients
+        });
+    });
+</script>

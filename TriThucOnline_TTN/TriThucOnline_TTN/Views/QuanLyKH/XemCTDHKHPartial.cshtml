@@ -1,5 +1,5 @@
 ﻿@using TriThucOnline_TTN.Models;
-@model List<DONHANG>
+@model User
 
 <table class="table table-bordered table-hover table-condensed table-striped">
     <thead>
@@ -8,34 +8,22 @@
             <th>Tên khách hàng:</th>
             <th>Ngày mua hàng:</th>
             <th>SĐT khách hàng:</th>
-            <th>Ngày giao hàng:</th>
-            <th>Trạng thái thanh toán:</th>
-            <th>Trạng thái giao hàng:</th>
+            <th>Ngày yêu cầu giao:</th>
+            <th>Trạng thái:</th>
+            <th>Tổng tiền:</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.orders)
         {
         <tr>
-            <td>@item.MaDH</td>
-            <td>@item.KHACHHANG.TenKH</td>
-            <td>
-                @item.NgayMuaHang.Value.ToString("dd/MM/yyyy")
-            </td>
-            <td>@item.KHACHHANG.SDT</td>
-            <td>@item.NgayGiao.Value.ToString("dd/MM/yyyy")</td>
-            <td>@item.TrangThaiThanhToan</td>
-            <td>
-                @{if (item.TrangThaiGiao == 1)
-                    {
-                        <p>Thành công</p>
-                    }
-                    else
-                    {
-                        <p>Chưa giao hàng</p>
-                    }
-                        }
-                    </td>
+            <td>@item.id</td>
+            <td>@Model.name</td>
+            <td>@item.order_date</td>
+            <td>@Model.phone</td>
+            <td>@item.required_date</td>
+            <td>@item.status</td>
+            <td>@item.total</td>
         </tr>
         }
     </tbody>
