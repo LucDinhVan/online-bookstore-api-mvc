@@ -1,4 +1,5 @@
-﻿using PagedList;
+﻿using Newtonsoft.Json;
+using PagedList;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +8,9 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
+using TriThucOnline_TTN.Repository;
 using TriThucOnline_TTN.Models;
+using RestSharp;
 
 namespace TriThucOnline_TTN.Controllers
 {
@@ -22,9 +25,9 @@ namespace TriThucOnline_TTN.Controllers
         [HttpGet]
         public ActionResult Login()
         {
-            if(Session["TaiKhoan"] != null)
+            if (Request.Cookies[".ASPXAUTH"] != null)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index");
             }
             return View();
         }
@@ -49,15 +52,15 @@ namespace TriThucOnline_TTN.Controllers
             string sTaiKhoan = f["username"].ToString();
             string sMatKhau = f.Get("password").ToString();
             string urlString = f.Get("urlString").ToString();
-            var usr = (from u in db.KHACHHANGs
-                       where u.Username == sTaiKhoan && u.Password == sMatKhau
-                       select u).FirstOrDefault();
-            //TempData["UserName"] = usr.TaiKhoan;
-            if (usr != null)
+            int idAcc = Repo_Account.CheckLogin(sTaiKhoan, sMatKhau);
+            User usr = Repo_Account.GetAccount(idAcc);
+            if (idAcc != -1)
             {
+
                 //create seession/ token for loged in user
-                // FormsAuthentication.SetAuthCookie(usr.TaiKhoan, false);
+                //FormsAuthentication.SetAuthCookie(usr.username, false);
                 Session["TaiKhoan"] = usr;
+                Session.Add("idTK", usr.id);
                 //lay gio hang cua khach hang 
                 if (urlString.Trim() != "")
                 {
@@ -66,8 +69,7 @@ namespace TriThucOnline_TTN.Controllers
                         return RedirectToAction("Index", "Home");
                     if (url[url.Length - 1].Contains("GioHang"))
                     {
-                        KHACHHANG kh = Session["TaiKhoan"] as KHACHHANG;
-
+                        User kh = Session["TaiKhoan"] as User;
                         return RedirectToAction("Confirm", "GioHang");
                     }
                     else
@@ -76,20 +78,21 @@ namespace TriThucOnline_TTN.Controllers
                 else
                     return RedirectToAction("Index", "Home");
             }
-            usr = (from u in db.KHACHHANGs
-                   where u.Username == sTaiKhoan
-                   select u).FirstOrDefault();
-            if (usr == null)
-            {
-                TempData["Message"] = "The username was not found or was deleted due to a violation";
-                ViewBag.ThongBao = "Tài khoản không tồn tại hoặc đã bị xóa vì vi phạm!";
-                return View();
-            }
+
+            //if (usr == null)
+            //{
+            //    TempData["Message"] = "The username was not found or was deleted due to a violation";
+            //    ViewBag.ThongBao = "Tài khoản không tồn tại hoặc đã bị xóa vì vi phạm!";
+            //    return View();
+            //}
 
             TempData["Message"] = "Username or password is wrong";
             ViewBag.ThongBao = "Tên tài khoản hoặc mật khẩu không đúng!";
 
             return View();
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
             //KhachHang kh = db.KhachHangs.SingleOrDefault(n => n.TaiKhoan == sTaiKhoan && n.MatKhau == sMatKhau);
             //if (kh != null)
             //{
@@ -117,28 +120,56 @@ namespace TriThucOnline_TTN.Controllers
             
         }
         [HttpPost]
-        [ValidateInput(false)]
-        public ActionResult Register(KHACHHANG kh)
-        {
-            if (ModelState.IsValid)
-            {
-                KHACHHANG customer = db.KHACHHANGs.SingleOrDefault(user => user.Username == kh.Username);
-                if (customer != null)
-                {
-                    ViewBag.ThongBao = "Lỗi: Tên tài khoản đã tồn tại";
-                    return View(kh);
-                }
-                //Chèn dữ liệu vào bảng khách hàng
-                db.KHACHHANGs.Add(kh);
-                //Lưu vào csdl 
-                db.SaveChanges();
+        //[ValidateInput(false)]
+        //public ActionResult Register(KHACHHANG kh)
+        //{
 
-                ViewBag.ThongBao = "Đăng ký thành công";
-                return RedirectToAction("Login");
+        public JsonResult Register(string name, string username ,string password, string email)
+        {
+            Extensions.request = new RestRequest($"register", Method.POST);
+
+            var data = JsonConvert.SerializeObject(new { name = name, username = username, password = password, email = email });
+            Extensions.request.AddParameter("application/json", data, ParameterType.RequestBody);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                return Json(new { status = true});
+                
+            }
+            else
+            {
+                Response.StatusCode = 500;
+                Response.Write(result.Content);
+                return null;
             }
 
-            return View(kh);
         }
+
+
+        //if (ModelState.IsValid)
+        //{
+        //    KHACHHANG customer = db.KHACHHANGs.SingleOrDefault(user => user.Username == kh.Username);
+        //    if (customer != null)
+        //    {
+        //        ViewBag.ThongBao = "Lỗi: Tên tài khoản đã tồn tại";
+        //        return View(kh);
+        //    }
+        //    //Chèn dữ liệu vào bảng khách hàng
+        //    db.KHACHHANGs.Add(kh);
+        //    //Lưu vào csdl 
+        //    db.SaveChanges();
+
+        //    ViewBag.ThongBao = "Đăng ký thành công";
+        //    return RedirectToAction("Login");
+        //}
+
+        //return View(kh);
+
+    
         public ActionResult Logout(string urlString)
         {
             //FormsAuthentication.SignOut();

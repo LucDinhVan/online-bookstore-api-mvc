@@ -161,9 +161,9 @@
                 }
                 else
                 {
-                    KHACHHANG kh = Session["TaiKhoan"] as KHACHHANG;
+                    User kh = Session["TaiKhoan"] as User;
                     <li class="nav-item">
-                        <a class="nav-link home-signup" href="@Url.Action("Details", "NguoiDung")">@kh.TenKH</a>
+                        <a class="nav-link home-signup" href="@Url.Action("Details", "NguoiDung")">@kh.name</a>
                     </li>
 
                     <li class="nav-item">
@@ -172,19 +172,19 @@
 
 
                 }
-                @{ List<CartItem> lstGioHang = Session["ShoppingCart"] as List<CartItem>;
+                @{ List<Cart> lstGioHang = Session["ShoppingCart"] as List<Cart>;
                     if (lstGioHang == null)
                     {
-                        lstGioHang = new List<CartItem>();
+                        lstGioHang = new List<Cart>();
                         Session["ShoppingCart"] = lstGioHang;
                     }
                     int cartcount = 0;
                     if (Session["ShoppingCart"] != null)
                     {
 
-                        foreach (CartItem item in lstGioHang)
+                        foreach (Cart item in lstGioHang)
                         {
-                            cartcount += item.Quality;
+                            cartcount += item.quantity;
                         }
                     }
 
@@ -381,8 +381,8 @@
         {
             i = 1;
         }
-        KHACHHANG kh = Session["TaiKhoan"] as KHACHHANG;
-        tenkh = kh.TenKH;
+        User kh = Session["TaiKhoan"] as User;
+        tenkh = kh.name;
     }
 
     <script>
@@ -467,7 +467,7 @@
                 $.ajax({
                     type:'POST',
                     url: '/GioHang/KhuyenMai',
-                    data: {id:maKM},
+                    data: {code:maKM},
                     success: function (data) {
                         $("#SpanKhuyenMai").html(data.tb);
                         $("#prgb_discount").attr("style", "width:"+data.gt);
@@ -557,10 +557,12 @@
         }
         function DathangSubmit() {
             var ngayGiao = document.getElementById("NgayGiao").value;
+            let required_date = new Date(ngayGiao).getTime()/1000;
+            var makm = document.getElementById("coupon_code").value;
             $.ajax({
                 type: 'POST',
                 url: '/GioHang/DatHangSubmit',
-                data: { NgayGiao: ngayGiao, MaKM: makm },
+                data: { NgayGiao: required_date, MaKM: makm },
                 success: function (data) {
                     debugger;
                     if (data.success) {

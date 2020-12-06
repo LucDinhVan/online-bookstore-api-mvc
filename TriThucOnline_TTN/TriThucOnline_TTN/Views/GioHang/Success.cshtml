@@ -1,48 +1,48 @@
 ﻿
 @using TriThucOnline_TTN.Models;
 
-@model List<CartItem>
+@model Carts
 
 
-@foreach (var item in Model)
+@foreach (var item in Model.carts)
 {
     <tr>
         <td class="cart_products-delete">
-            <button style="border:none; background-color: white;" onclick="Remove('@item.productOrder.MaSach')">
+            <button style="border:none; background-color: white;" onclick="Remove('@item.book_id')">
                 <i class="far fa-trash-alt"></i>
             </button>
         </td>
         <td>
-            <img src="@Url.Content("/Content/HinhAnhSP/" + item.productOrder.PicBook)" alt="">
+            <img src="#" alt="">
         </td>
         <td>
-            <a href="@Url.Action("Details", "DAUSACH", new { @id = item.productOrder.MaSach })"><p>@item.productOrder.TenSach</p></a>
-            <b>@string.Format("{0:0,0}", item.productOrder.GiaTien) VNĐ</b>
+            <a href="@Url.Action("Details", "DAUSACH", new { @id = item.book_id })"><p>@item.book_name</p></a>
+            <b>@string.Format("{0:0,0}", item.book_id) VNĐ</b>
         </td>
         <td style="text-align:center">
             <div class="input-group soluong_giohang">
                 <span class="input-group-btn">
-                    <button type="button" class="quantity-left-minus btn btn-number" data-type="minus" data-field="" onclick="CapNhatSoLuong('@item.productOrder.MaSach', '-')">
+                    <button type="button" class="quantity-left-minus btn btn-number" data-type="minus" data-field="" onclick="CapNhatSoLuong('@item.book_id', '-')">
                         <span class="glyphicon glyphicon-minus">-</span>
                     </button>
                 </span>
-                <input type="text" id="SoLuong[@item.productOrder.MaSach]" name="quantity" class="form-control input-number" value="@item.Quality" min="1" max="100" step="1" type="number">
+                <input type="text" id="SoLuong[@item.book_id]" name="quantity" class="form-control input-number" value="@item.quantity" min="1" max="100" step="1" type="number">
                 <span class="input-group-btn">
-                    <button type="button" class="quantity-right-plus btn btn-number" data-type="plus" data-field="" onclick="CapNhatSoLuong('@item.productOrder.MaSach', '+')">
+                    <button type="button" class="quantity-right-plus btn btn-number" data-type="plus" data-field="" onclick="CapNhatSoLuong('@item.book_id', '+')">
                         <span class="glyphicon glyphicon-plus">+</span>
                     </button>
                 </span>
             </div>
             <p style="margin:5px">Thành Tiền </p>
-            <p style="color:#F11499">@string.Format("{0:0,0}", item.productOrder.GiaTien * item.Quality) VNĐ</p>
+            <p style="color:#F11499">@string.Format("{0:0,0}", item.total) VNĐ</p>
         </td>
     </tr>
 
 }
 @{double tongTien = 0;
-    foreach (var item in Model)
+    foreach (var item in Model.carts)
     {
-        tongTien += (double)item.productOrder.GiaTien * item.Quality;
+        tongTien += (double)item.total;
     }
 }
 <script>

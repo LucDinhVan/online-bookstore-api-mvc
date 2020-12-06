@@ -7,7 +7,7 @@ namespace TriThucOnline_TTN.Models
 {
     public class CartItem
     {
-        public DAUSACH productOrder { get; set; }
+        public Book productOrder { get; set; }
         public int Quality { get; set; }
     }
 }

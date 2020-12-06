@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-
 using TriThucOnline_TTN.Models;
+using System.IO;
 using PagedList;
-using PagedList.Mvc;
+using Newtonsoft.Json;
+using RestSharp;
+
 namespace TriThucOnline_TTN.Controllers
 {
     [Authorize]
@@ -16,15 +18,50 @@ namespace TriThucOnline_TTN.Controllers
         SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
         public ActionResult Index(int? page)
         {
+            Publishers publishers = null;
+            // GET đây là get
+
+            Extensions.request = new RestRequest($"publishers?name", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                publishers = JsonConvert.DeserializeObject<Publishers>(result.Content);
+            }
+            else
+            {
+
+            }
             int pageNumber = (page ?? 1);
             int pageSize = 10;
-            return View(db.NXBs.ToList().OrderBy(n => n.MaNXB).ToPagedList(pageNumber, pageSize));
+            return View(publishers.publishers.ToList().OrderBy(n => n.id).ToPagedList(pageNumber, pageSize));
         }
+        [HttpGet]
         public PartialViewResult IndexPartial(int? page)
         {
+            Publishers publishers = null;
+            // GET
+
+            Extensions.request = new RestRequest($"publishers?name", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                publishers = JsonConvert.DeserializeObject<Publishers>(result.Content);
+            }
+            else
+            {
+
+            }
             int pageNumber = (page ?? 1);
             int pageSize = 10;
-            return PartialView(db.NXBs.ToList().OrderBy(n => n.MaNXB).ToPagedList(pageNumber, pageSize));
+            return PartialView(publishers.publishers.ToList().OrderBy(n => n.id).ToPagedList(pageNumber, pageSize));
         }
         /// <summary>
         /// Tao moi
@@ -50,7 +87,7 @@ namespace TriThucOnline_TTN.Controllers
                 ViewBag.ThongBao = "Thêm mới thất bại";
                 return View(nxb);
             }
-            return RedirectToAction("Index", new { page = db.NXBs.Count()/10});
+            return RedirectToAction("Index", new { page = db.NXBs.Count() / 10 });
         }
 
         [HttpGet]
@@ -87,32 +124,98 @@ namespace TriThucOnline_TTN.Controllers
 
         }
 
-        [HttpPost]
-        public JsonResult XemCTNXB(int manxb)
+        public PartialViewResult XemCTNXBPartial(int? id)
         {
-            TempData["manxb"] = manxb;
-            return Json(new { Url = Url.Action("XemCTNXBPartial") });
-        }
-        public PartialViewResult XemCTNXBPartial()
-        {
-            int maNXB = (int)TempData["manxb"];
-            var lstNXB = db.NXBs.Where(n => n.MaNXB == maNXB).ToList();
-            return PartialView(lstNXB);
+            Publisher publisher = null;
+            // GET
+
+            Extensions.request = new RestRequest($"publishers/{id}", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                publisher = JsonConvert.DeserializeObject<Publisher>(result.Content);
+            }
+            else
+            {
+
+            }
+            return PartialView(publisher);
         }
 
-        /////////////////////
         [HttpPost]
         public JsonResult Remove(int id)
         {
-            NXB nxb = db.NXBs.SingleOrDefault(n => n.MaNXB == id);
-            if (nxb == null)
+            // đây là delete
+            Extensions.request = new RestRequest($"publishers/{id}", Method.DELETE);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                Response.StatusCode = 404;
+                return Json(new { Url = Url.Action("IndexPartial") });
+            }
+            else
+            {
+                Response.StatusCode = 500;
                 return null;
             }
-            db.NXBs.Remove(nxb);
-            db.SaveChanges();
-            return Json(new { Url = Url.Action("IndexPartial") });
+        }
+
+        [HttpPost]
+        public JsonResult Update(int id, string name)
+        {
+            //POST/PUT
+            Extensions.request = new RestRequest($"publishers/{id}", Method.PUT);
+
+            var data = JsonConvert.SerializeObject(new { id = id, name = name });
+            Extensions.request.AddParameter("application/json", data, ParameterType.RequestBody);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                return Json(new { Url = Url.Action("IndexPartial") });
+            }
+            else
+            {
+                Response.StatusCode = 500;
+                Response.Write(result.Content);
+                return null;
+            }
+
+        }
+
+        [HttpPost]
+        public JsonResult Add(string name)
+        {
+            Extensions.request = new RestRequest($"publishers", Method.POST);
+
+            var data = JsonConvert.SerializeObject(new {name = name });
+            Extensions.request.AddParameter("application/json", data, ParameterType.RequestBody);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                return Json(new { Url = Url.Action("IndexPartial") });
+            }
+            else
+            {
+                Response.StatusCode = 500;
+                Response.Write(result.Content);
+                return null;
+            }
+
         }
     }
 }

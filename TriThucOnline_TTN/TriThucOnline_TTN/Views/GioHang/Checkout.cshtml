@@ -1,25 +1,25 @@
 ﻿
 @using TriThucOnline_TTN.Models;
 
-@model List<CartItem>
+@model List<Cart>
 
 
 @foreach (var item in Model)
 {
     <tr>
         <td>
-            <img src="@Url.Content("/Content/HinhAnhSP/" + item.productOrder.PicBook)" style="margin-right: 40px" alt="">
+            <img src="" style="margin-right: 40px" alt="">
         </td>
         <td>
-            <a href="@Url.Action("Details", "DAUSACH", new { @id = item.productOrder.MaSach })"><p style="margin-right: 40px">@item.productOrder.TenSach</p></a>
+            <a href="@Url.Action("Details", "DAUSACH", new { @id = item.book_id })"><p style="margin-right: 40px">@item.book_name</p></a>
         </td>
         <td style="text-align:center">
                 <p style="margin:5px;margin-right: 40px">Số lượng</p>
-                <p style="margin-right: 40px">@item.Quality</p>
+                <p style="margin-right: 40px">@item.quantity</p>
         </td>
         <td >
             <p style="margin:5px">Thành Tiền </p>
-            <p style="color:#F11499">@string.Format("{0:0,0}", item.productOrder.GiaTien * item.Quality) VNĐ</p>
+            <p style="color:#F11499">@string.Format("{0:0,0}", item.total * item.quantity) VNĐ</p>
         </td>
     </tr>
 
@@ -27,7 +27,7 @@
 @{double tongTien = 0;
     foreach (var item in Model)
     {
-        tongTien += (double)item.productOrder.GiaTien * item.Quality;
+        tongTien += (double)item.total * item.quantity;
     }
 }
 <script>

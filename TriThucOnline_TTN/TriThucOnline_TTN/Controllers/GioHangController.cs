@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using RestSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Web;
 using System.Web.Mvc;
 using TriThucOnline_TTN.Models;
@@ -10,15 +13,23 @@ namespace TriThucOnline_TTN.Controllers
     public class GioHangController : Controller
     {
         SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
-        public List<CartItem> LayGioHang()
+        public List<Cart> LayGioHang()
         {
-            List<CartItem> lstGioHang = Session["ShoppingCart"] as List<CartItem>;
-            if (lstGioHang == null)
+            Carts carts = null;
+            Extensions.request = new RestRequest($"carts", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                lstGioHang = new List<CartItem>();
-                Session["ShoppingCart"] = lstGioHang;
+                carts = JsonConvert.DeserializeObject<Carts>(result.Content);
+                ViewBag.CacSanPhamTrongGio = carts.carts;
             }
-            return lstGioHang;
+
+            return carts.carts;
+
         }
         public ActionResult GioHangTrong()
         {
@@ -26,45 +37,58 @@ namespace TriThucOnline_TTN.Controllers
         }
         public ActionResult Index()
         {
+            Carts carts = null;
+            Extensions.request = new RestRequest($"carts", Method.GET);
 
-            if (Session["ShoppingCart"] != null)
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                if (((List<CartItem>)Session["ShoppingCart"]).Count > 0)
-                {
-                    List<CartItem> lstGioHang = LayGioHang();
-                    return View(lstGioHang);
-                }
+                carts = JsonConvert.DeserializeObject<Carts>(result.Content);
+                ViewBag.CacSanPhamTrongGio = carts.carts;
             }
-            //return Giohang Trống
-            return RedirectToAction("GioHangTrong");
+            else
+            {
+                //return Giohang Trống
+                return RedirectToAction("GioHangTrong");
+            }
+
+
+            return View(carts);
         }
-        
+
         [HttpGet]
         public ActionResult Confirm()
         {
-            if (Session["ShoppingCart"] == null || ((List<CartItem>)Session["ShoppingCart"]).Count == 0)
-            {
-                return RedirectToAction("Index", "Home");
-            }
             if (Session["TaiKhoan"] == null || Session["TaiKhoan"].ToString() == "")
             {
                 return RedirectToAction("Login", "NguoiDung");
             }
 
-            KHACHHANG kh = Session["TaiKhoan"] as KHACHHANG;
+            User kh = Session["TaiKhoan"] as User;
 
             return View(kh);
         }
+
+        [HttpGet]
+        public ActionResult _Partial_Confirm()
+        {
+            List<Cart> lstGioHang = LayGioHang();
+            return PartialView(lstGioHang);
+        }
+
         //dem so luong san pham
         public ActionResult GioHangPartial()
         {
             int cartcount = 0;
             if (Session["ShoppingCart"] != null)
             {
-                List<CartItem> ls = (List<CartItem>)Session["ShoppingCart"];
-                foreach (CartItem item in ls)
+                List<Cart> ls = (List<Cart>)Session["ShoppingCart"];
+                foreach (Cart item in ls)
                 {
-                    cartcount += item.Quality;
+                    cartcount += item.quantity;
                 }
             }
             ViewBag.count = cartcount;
@@ -96,66 +120,35 @@ namespace TriThucOnline_TTN.Controllers
         {
             try
             {
-                DONHANG dh = new DONHANG();
-                KHUYENMAI km = db.KHUYENMAIs.Find(MaKM);
-                if (Session["TaiKhoan"] != null || Session["TaiKhoan"].ToString() == "")
+                if (string.IsNullOrEmpty(MaKM)) MaKM = "";
+                List<Cart> carts = LayGioHang();
+                List<object> list = new List<object>();
+                foreach (Cart cart in carts)
                 {
-                    KHACHHANG customer = (KHACHHANG)Session["TaiKhoan"];
-                    if (ModelState.IsValid)
-                    {
-                        dh.MaKH = customer.MaKH;
-                        dh.NgayMuaHang = DateTime.Now;
-                        if (NgayGiao.Trim() != "")
-                            dh.NgayGiao = Convert.ToDateTime(NgayGiao);
-
-                        dh.TrangThaiGiao = 0;
-                        dh.TrangThaiThanhToan = "Chưa thanh toán";
-                        if (!string.IsNullOrEmpty(MaKM))
-                        {
-                            dh.MaKM = MaKM;
-                            dh.KHUYENMAI = db.KHUYENMAIs.Find(MaKM);
-                        }
-
-                        db.DONHANGs.Add(dh);
-
-                        db.SaveChanges();
-                        if (!string.IsNullOrEmpty(MaKM))
-                            foreach (var item in db.KHUYENMAIs)
-                            {
-                                if (item.MaKM.ToLower() == MaKM.ToLower())
-                                {
-                                    item.SoLanConLai--;
-                                    break;
-                                }
-                            }
-                        db.SaveChanges();
-                    }
+                    var obj = new { book_id = cart.book_id, quantity=cart.quantity };
+                    list.Add(obj);
                 }
-                if (Session["ShoppingCart"] != null)
+
+
+
+                Extensions.request = new RestRequest($"orders", Method.POST);
+
+                var data = JsonConvert.SerializeObject(new { required_date = NgayGiao, coupon_code = MaKM, order_details= list});
+                Extensions.request.AddParameter("application/json", data, ParameterType.RequestBody);
+
+                var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+                responseTask.Wait();
+
+                var result = responseTask.Result;
+                if (result.IsSuccessful)
                 {
-                    List<CartItem> ls = (List<CartItem>)Session["ShoppingCart"];
-                    foreach (CartItem item in ls)
-                    {
-                        CT_DONHANG CTDH = new CT_DONHANG();
-                        CTDH.MaDH = dh.MaDH;
-                        CTDH.MaSach = item.productOrder.MaSach;
-                        CTDH.SoLuong = item.Quality;
-                        if (!string.IsNullOrEmpty(MaKM))
-                        {
-                            CTDH.DonGia = item.productOrder.GiaTien - (item.productOrder.GiaTien * (km.GiaTriKM / 100));
-                        }
-                        else
-                        {
-                            CTDH.DonGia = item.productOrder.GiaTien;
-                        }
-                        db.CT_DONHANG.Add(CTDH);
-
-                        DAUSACH sach = db.DAUSACHes.Find(item.productOrder.MaSach);
-                        sach.SoLuongTon -= item.Quality;
-                        db.SaveChanges();
-                    }
+                    dynamic obj = JsonConvert.DeserializeObject<Object>(result.Content);
                 }
-                Session["ShoppingCart"] = null;
+                else
+                {
+                    return Json(new { success = false, msg = "Đặt hàng thất bại, vui lòng thử lại!" });
+                }
+
             }
             catch (Exception)
             {
@@ -173,7 +166,7 @@ namespace TriThucOnline_TTN.Controllers
         [HttpPost]
         public ActionResult Checkout()
         {
-            List<CartItem> lstGioHang = LayGioHang();
+            List<Cart> lstGioHang = LayGioHang();
             return PartialView(lstGioHang);
         }
 
@@ -183,14 +176,14 @@ namespace TriThucOnline_TTN.Controllers
         {
             bool success = true;
             string error = "";
-            List<CartItem> listCartItem = (List<CartItem>)Session["ShoppingCart"];
+            List<Cart> listCartItem = (List<Cart>)Session["ShoppingCart"];
             //nếu người dùng thêm hàng vào giỏ và lại trở về trang chủ thêm hàng tiếp 
             //thì session shoppingcart này có đang giữ tất cả sách trong giỏ hàng hiện tại hay không ?
             //có. cập nhật vào Session["ShoppingCart"] mà
             int cartcount = 0;
             foreach (var item in listCartItem)
             {
-                if (item.productOrder.MaSach == id)
+                if (item.id == id)
                 {
                     if (db.DAUSACHes.Find(id).SoLuongTon < sl)
                     {
@@ -198,11 +191,11 @@ namespace TriThucOnline_TTN.Controllers
                         error = "Rất tiếc, kho hàng của sản phẩm không đủ";
                     }
                     else
-                        item.Quality = sl;
+                        item.quantity = sl;
                     // break;
 
                 }
-                cartcount += item.Quality;
+                cartcount += item.quantity;
             }
             Session["ShoppingCart"] = listCartItem;
 
@@ -212,7 +205,7 @@ namespace TriThucOnline_TTN.Controllers
         [HttpPost]
         public ActionResult Success()
         {
-            List<CartItem> lstGioHang = LayGioHang();
+            List<Cart> lstGioHang = LayGioHang();
             return PartialView(lstGioHang);
         }
 
@@ -221,10 +214,10 @@ namespace TriThucOnline_TTN.Controllers
         public ActionResult Remove(int id)
         {
             int cartCount = 0;
-            List<CartItem> listCartItem = (List<CartItem>)Session["ShoppingCart"];
+            List<Cart> listCartItem = (List<Cart>)Session["ShoppingCart"];
             foreach (var item in listCartItem)
             {
-                if (item.productOrder.MaSach == id)
+                if (item.id == id)
                 {
                     listCartItem.Remove(item);
                     break;
@@ -232,21 +225,39 @@ namespace TriThucOnline_TTN.Controllers
             }
             foreach (var item in listCartItem)
             {
-                cartCount += item.Quality;
+                cartCount += item.quantity;
             }
             Session["ShoppingCart"] = listCartItem;
             return Json(new { Url = Url.Action("Success"), sl = cartCount });
         }
 
         [HttpPost]
-        public ActionResult KhuyenMai(string id)
+        public ActionResult KhuyenMai(string code)
         {
-            KHUYENMAI km = db.KHUYENMAIs.Find(id);
-            if (km == null || km.NgayBD > DateTime.Now || km.NgayKT < DateTime.Now || km.SoLanConLai <= 0)
+            // GET
+            Coupon cp = new Coupon();
+            Extensions.request = new RestRequest($"coupons/{code}", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                cp = JsonConvert.DeserializeObject<Coupon>(result.Content);
+            }
+            else
+            {
+
+            }
+
+            if (cp == null || DateTime.ParseExact(cp.valid_from, "dd/MM/yyyy HH:mm:ss",
+                                       System.Globalization.CultureInfo.InvariantCulture) > DateTime.Now || cp.is_enable == false || DateTime.ParseExact(cp.valid_until, "dd/MM/yyyy HH:mm:ss",
+                                       System.Globalization.CultureInfo.InvariantCulture) < DateTime.Now || cp.count <= 0)
             {
                 return Json(new { tb = "Lỗi!", id = "", gt = "" });
             }
-            return Json(new { tb = "Mã khuyến mãi có hiệu lực: ", id = id, gt = km.GiaTriKM + "%" });
+            return Json(new { tb = "Mã khuyến mãi có hiệu lực: ", code = code, gt = cp.discount + "%" });
         }
     }
 }

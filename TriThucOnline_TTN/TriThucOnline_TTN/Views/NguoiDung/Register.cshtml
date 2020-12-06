@@ -13,20 +13,25 @@
 <link rel="stylesheet" href="~/Content/Register/css/style.css">
 @*font awesome*@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" rel="stylesheet" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 <style>
     /*các thông báo lỗi sẽ được chứa trong các label với class là error*/
     label.error {
         color: red;
     }
+
     .iphone img {
-        width:50%;
+        width: 50%;
     }
-    .register-container{
-        margin-top:100px;
+
+    .register-container {
+        margin-top: 100px;
     }
-    .register{
-        width:40%;
-        margin:auto;
+
+    .register {
+        width: 40%;
+        margin: auto;
     }
 </style>
 <div class="header">
@@ -48,22 +53,22 @@
                 <fieldset>
                     <h2>REGISTER TO <span class="red"><strong>TRITHUCONLINE</strong></span></h2>
 
-                    <label class="error">@ViewBag.ThongBao</label>
+                    <label class="error">Lỗi đăng kí</label>
 
                     <div class="form-group">
-                        @Html.LabelFor(model => model.TenKH, "Họ và tên", new { @class = "control-label col-md-6" })
-                        <div class="col-md-10">
-                            <input type="text" value="@Model.TenKH" name="TenKH" id="TenKH" size="25" class="required form-control" placeholder="Họ và tên..." autofocus />
+                            @Html.LabelFor(model => model.TenKH, "Họ và tên", new { @class = "control-label col-md-6" })
+                            <div class="col-md-10">
+                                <input type="text" value="@Model.TenKH" name="TenKH" id="name" size="25" class="required form-control" placeholder="Họ và tên..." autofocus />
+                            </div>
                         </div>
-                    </div>
 
 
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.SDT, "Số điện thoại", new { @class = "control-label col-md-6" })
-                        <div class="col-md-10">
-                            <input type="number" value="@Model.SDT" name="SDT" id="SDT" size="25" class="required form-control" placeholder="Điện thoại..." />
-                        </div>
-                    </div>
+                    @*<div class="form-group">
+                            @Html.LabelFor(model => model.SDT, "Số điện thoại", new { @class = "control-label col-md-6" })
+                            <div class="col-md-10">
+                                <input type="number" value="@Model.SDT" name="SDT" id="SDT" size="25" class="required form-control" placeholder="Điện thoại..." />
+                            </div>
+                        </div>*@
 
                     <div class="form-group">
                         @Html.LabelFor(model => model.Username, "Tên tài khoản", new { @class = "control-label col-md-6" })
@@ -78,12 +83,12 @@
                             <input type="password" value="" name="Password" id="Password" size="25" class="required form-control" placeholder="Mật khẩu..." />
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="cpassword" class="control-label col-md-6">Nhập lại mật khẩu</label>
-                        <div class="col-md-10">
-                            <input type="password" value="" name="cpassword" id="cpassword" size="25" equalTo="#MatKhau" class="form-control" placeholder="Nhập lại mật khẩu..." />
-                        </div>
-                    </div>
+                    @*<div class="form-group">
+                            <label for="cpassword" class="control-label col-md-6">Nhập lại mật khẩu</label>
+                            <div class="col-md-10">
+                                <input type="password" value="" name="cpassword" id="cpassword" size="25" equalTo="#MatKhau" class="form-control" placeholder="Nhập lại mật khẩu..." />
+                            </div>
+                        </div>*@
 
                     <div class="form-group">
                         @Html.LabelFor(model => model.Email, "Email", new { @class = "control-label col-md-6" })
@@ -93,15 +98,8 @@
                     </div>
 
                     <div class="form-group">
-                        @Html.LabelFor(model => model.DiaChi, "Địa chỉ", new { @class = "control-label col-md-6" })
-                        <div class="col-md-10">
-                            <input type="text" value="@Model.DiaChi" name="DiaChi" id="DiaChi" size="25" class="required form-control" placeholder="Địa chỉ..." />
-                        </div>
-                    </div>
-
-                    <div class="form-group">
                         <div class="col-md-offset-2 col-md-10">
-                            <input id="btnSubmit" type="submit" style="background-color:#eb4141" value="Đăng ký" class="btn btn-group-vertical btn-success" />
+                            <input id="btnSubmit" type="button" style="background-color:#eb4141" value="Đăng ký" class="btn btn-group-vertical btn-success" />
                         </div>
                     </div>
                 </fieldset>
@@ -110,117 +108,138 @@
         </div>
     </div>
 </div>
+@*
+    <script>
+        $(document).ready(function () {
+            var validator = $("#input_form").validate({
+                rules: {
+                    username: "required",
+                    password: {
+                        required: true,
+                        minlength: 6,
+                    },
+                    cpassword: {
+                        equalTo: "#MatKhau"
+                    },
 
-<script>
-    $(document).ready(function () {
-        var validator = $("#input_form").validate({
-            rules: {
-                username: "required",
-                password: {
-                    required: true,
-                    minlength: 6,
+                    DienThoai: "required",
+
+                    HoTen: "required",
+
+                    TaiKhoan: "required",
+                    MatKhau: "required"
+
+
+
                 },
-                cpassword: {
-                    equalTo: "#MatKhau"
-                },
-                //email: {
-                //    required: true,
-                //    email: true
-                //},
-                //Email: {
-                //    required: true,
-                //    Email: true
-                //},
+                messages: {
+                    username: "Hãy điền tên đăng nhập.",
+                    password: {
+                        required: "Hãy điền mật khẩu",
+                        minlength: "Mật khẩu ít nhất 6 ký tự"
+                    },
+                    cpassword: {
+                        equalTo: "Mật khẩu xác nhận không chính xác"
+                    },
 
-               // DiaChi: "required",
-                DienThoai: "required",
+                    DiaChi: "Hãy điền địa chỉ.",
+                    DienThoai: "Hãy điền số điện thoại.",
 
-                HoTen: "required",
-                //NgaySinh: "required",
-                TaiKhoan: "required",
-                MatKhau: "required"
+                    HoTen: "Hãy điền họ tên.",
+                    NgaySinh: "Hãy chọn ngày sinh.",
+                    TaiKhoan: "Hãy điền tài khoản.",
+                    MatKhau: "Hãy điền mật khẩu."
 
 
-
-            },
-            messages: {
-                username: "Hãy điền tên đăng nhập.",
-                password: {
-                    required: "Hãy điền mật khẩu",
-                    minlength: "Mật khẩu ít nhất 6 ký tự"
-                },
-                cpassword: {
-                    equalTo: "Mật khẩu xác nhận không chính xác"
-                },
-                //email: {
-                //    required: "Hãy nhập 1 địa chỉ email hợp lệ",
-                //    email:"Địa chỉ email không hợp lệ"
-                //},
-                //Email: {
-                //    required: "Hãy nhập địa chỉ email",
-                //    Email: "Địa chỉ email không hợp lệ"
-                //},
-
-                DiaChi: "Hãy điền địa chỉ.",
-                DienThoai: "Hãy điền số điện thoại.",
-
-                HoTen: "Hãy điền họ tên.",
-                NgaySinh: "Hãy chọn ngày sinh.",
-                TaiKhoan: "Hãy điền tài khoản.",
-                MatKhau: "Hãy điền mật khẩu."
-
-
-            }
+                }
+            });
         });
-    });
 
 
-function check() {
-    var value_email = document.getElementById("email").value;
-    var value_pwd = document.getElementById("pwd").value;
-    var value_username = document.getElementById("name").value;
-    var value_dob = document.getElementById("ngaysinh").value;
+    function check() {
+        var value_email = document.getElementById("email").value;
+        var value_pwd = document.getElementById("pwd").value;
+        var value_username = document.getElementById("name").value;
+        var value_dob = document.getElementById("ngaysinh").value;
 
-    var email_valid 
+        var email_valid;
 
-     @*   /([A-Z|a-z|0-9](\.|_){0,1})+[A-Z|a-z|0-9]@([A-Z|a-z|0-9])+((\.){0,1}[A-Z|a-z|0-9]){0,3}\.[a-z]{2,3}$/i;*@
-    var name_valid = /[\D]*?( [\D]*)$/i;
-    var dob_valid = /\b(0?[1-9]|[12]\d|3[01])[\/\-.](0?[1-9]|[1]?[0-2])[\/\-.](\d{4})\b/i;
 
-    if (!value_email.match(email_valid)) {
-        document.getElementById('checkEmail').innerHTML = "<font color='red'>Không đúng định dạng email!</font>";
-    }
-    else {
-        document.getElementById('checkEmail').innerHTML = "<font color='green'>Hợp lệ!</font>";
-    }
-    if ((value_pwd + '').length < 6) {
-        document.getElementById('checkPwd').innerHTML = "<font color='red'>Mật khẩu phải lớn hơn 6 ký tự!</font>";
-    }
-    else {
-        if ((value_pwd + '').length > 29) {
-            document.getElementById('checkPwd').innerHTML = "<font color='red'>Mật khẩu phải ngắn hơn 30 ký tự!</font>";
+        var name_valid = /[\D]*?( [\D]*)$/i;
+        var dob_valid = /\b(0?[1-9]|[12]\d|3[01])[\/\-.](0?[1-9]|[1]?[0-2])[\/\-.](\d{4})\b/i;
+
+        if (!value_email.match(email_valid)) {
+            document.getElementById('checkEmail').innerHTML = "<font color='red'>Không đúng định dạng email!</font>";
         }
         else {
-            document.getElementById('checkPwd').innerHTML = "<font color='green'>Hợp lệ!</font>";
+            document.getElementById('checkEmail').innerHTML = "<font color='green'>Hợp lệ!</font>";
+        }
+        if ((value_pwd + '').length < 6) {
+            document.getElementById('checkPwd').innerHTML = "<font color='red'>Mật khẩu phải lớn hơn 6 ký tự!</font>";
+        }
+        else {
+            if ((value_pwd + '').length > 29) {
+                document.getElementById('checkPwd').innerHTML = "<font color='red'>Mật khẩu phải ngắn hơn 30 ký tự!</font>";
+            }
+            else {
+                document.getElementById('checkPwd').innerHTML = "<font color='green'>Hợp lệ!</font>";
+            }
+        }
+        if (!value_username.match(name_valid)) {
+            document.getElementById('checkName').innerHTML = "<font color='red'>Họ tên chỉ bao gồm các ký tự chữ cái!</font>";
+        }
+        else {
+            document.getElementById('checkName').innerHTML = "<font color='green'>Hợp lệ!</font>";
+        }
+        if (!value_dob.match(dob_valid)) {
+            document.getElementById('checkNgaySinh').innerHTML = "<font color='red'>Nhập ngày sinh theo đúng định dạng dd-mm-yyyy</font>";
+        }
+        else {
+            document.getElementById('checkNgaySinh').innerHTML = "<font color='green'>Hợp lệ!</font>";
         }
     }
-    if (!value_username.match(name_valid)) {
-        document.getElementById('checkName').innerHTML = "<font color='red'>Họ tên chỉ bao gồm các ký tự chữ cái!</font>";
+
+
+
+    </script>  *@
+
+
+<script>
+
+    $('#btnSubmit').click(function () {
+        add();
+    });
+
+    function create() {
+        $("#addModal").modal();
     }
-    else {
-        document.getElementById('checkName').innerHTML = "<font color='green'>Hợp lệ!</font>";
+    function add() {
+        let name = $('#name').val();
+        let username = $("#Username").val();
+        let password = $("#Password").val();
+        let email = $("#Email").val();
+        $.ajax({
+            type: 'POST',
+            url: '/NguoiDung/Register',
+            data: { username: username, password: password, email: email },
+            success: function (data) {
+                if (data.status == true)
+                    alert("Đăng kí thành công");
+                    window.location.href = "/Home/Index";
+              
+            },
+            error: function (data) {
+                alert(data.message);
+                alert("Đã có lỗi xảy ra khi cập nhật");
+            }
+        });
     }
-    if (!value_dob.match(dob_valid)) {
-        document.getElementById('checkNgaySinh').innerHTML = "<font color='red'>Nhập ngày sinh theo đúng định dạng dd-mm-yyyy</font>";
-    }
-    else {
-        document.getElementById('checkNgaySinh').innerHTML = "<font color='green'>Hợp lệ!</font>";
-    }
-}
 
 
 
 </script>
+
+
 <style>
     /*các thông báo lỗi sẽ được chứa trong các label với class là error*/
     label.error {

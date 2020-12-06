@@ -1,0 +1,29 @@
+﻿@using TriThucOnline_TTN.Models;
+
+@model List<Cart>
+
+
+    <table class="table table-borderless table-striped">
+
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">First</th>
+                <th scope="col">Last</th>
+                <th scope="col">Handle</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <th scope="row">1</th>
+                    <td>@item.book_name</td>
+                    <td>@item.total</td>
+                    <td>ảnh sách thêm sau</td>
+                </tr>
+            }
+        </tbody>
+
+
+    </table>

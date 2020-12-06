@@ -1,10 +1,11 @@
 ﻿
+@model TriThucOnline_TTN.Models.User
+
+
 @{
     ViewBag.Title = "Confirm";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-@model TriThucOnline_TTN.Models.KHACHHANG
 
 @{
     ViewBag.Title = "DatHang";
@@ -12,9 +13,10 @@
 }
 
 <style>
-    .checkout{
-        margin-top:30px;
+    .checkout {
+        margin-top: 30px;
     }
+
     .checkout_address, .checkout_shippingmethod, .checkout_paymentmethod, .checkout_otherinfo, .checkout_products {
         background-color: white;
         padding: 15px;
@@ -75,8 +77,9 @@
     .checkout_total--backcart a b p {
         margin-top: 10px;
     }
-    .cuoitrang{
-        display:none;
+
+    .cuoitrang {
+        display: none;
     }
 </style>
 
@@ -89,7 +92,7 @@
             <div class="address_detail">
                 <div>
                     <input type="radio" id="address" name="address" value="address">
-                    <label for="address">@Model.DiaChi | @Model.SDT</label>
+                    <label for="address">@Model.address | @Model.phone</label>
                 </div>
                 <div>
                     @*<input type="radio" id="address_new" name="address" value="address_new">*@
@@ -102,19 +105,19 @@
             <hr>
             <p>Miễn phí vận chuyển cho tất cả đơn hàng trên toàn quốc</p>
             @*<div class="shippingmethod_detail">
-                <div>
-                    <input type="radio" id="ghtc" name="shippingmethod" value="ghtc">
-                    <label for="ghtc"></label> Giao hàng tiêu chuẩn: 15.000 đ
-                </div>
-                <div>
-                    <input type="radio" id="ghn" name="shippingmethod" value="ghn">
-                    <label for="ghn"></label> Giao hàng nhanh: 20.000 đ
-                </div>
-                <div>
-                    <input type="radio" id="ghtk" name="shippingmethod" value="ghtk">
-                    <label for="ghtk"></label> Giao hàng tiết kiệm: 23.000 đ
-                </div>
-            </div>*@
+                    <div>
+                        <input type="radio" id="ghtc" name="shippingmethod" value="ghtc">
+                        <label for="ghtc"></label> Giao hàng tiêu chuẩn: 15.000 đ
+                    </div>
+                    <div>
+                        <input type="radio" id="ghn" name="shippingmethod" value="ghn">
+                        <label for="ghn"></label> Giao hàng nhanh: 20.000 đ
+                    </div>
+                    <div>
+                        <input type="radio" id="ghtk" name="shippingmethod" value="ghtk">
+                        <label for="ghtk"></label> Giao hàng tiết kiệm: 23.000 đ
+                    </div>
+                </div>*@
         </div>
         <div class="checkout_paymentmethod">
             <h4 class="tieude">phương thức thanh toán</h4>
@@ -147,13 +150,13 @@
             <HR></HR>
             <div class="otherinfo_detail">
                 @*<div>
-                    <input type="radio" id="ghichu" name="otherinfo" value="ghichu">
-                    <label for="ghichu">Ghi chú</label>
-                </div>
-                <div>
-                    <input type="radio" id="hdvat" name="otherinfo" value="hdvat">
-                    <label for="hdvat"> Xuất hóa đơn VAT</label>
-                </div>*@
+                        <input type="radio" id="ghichu" name="otherinfo" value="ghichu">
+                        <label for="ghichu">Ghi chú</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="hdvat" name="otherinfo" value="hdvat">
+                        <label for="hdvat"> Xuất hóa đơn VAT</label>
+                    </div>*@
                 <div>
                     <input type="date" id="NgayGiao" name="" value="@DateTime.Now.AddDays(10).ToString("yyyy-MM-dd")">
                     @*<label for="NgayGiao"> Xuất hóa đơn VAT</label>*@
@@ -164,9 +167,6 @@
             <h4 class="tieude">Kiểm tra lại đơn hàng</h4>
             <HR></HR>
             <div class="products_detail" id="GioHang">
-                <table class="table table-borderless">
-
-                </table>
 
             </div>
         </div>
@@ -245,8 +245,15 @@
 </body>
 
 <script>
-        $(document).ready(function () {
-            
-            CheckoutCart();
+    $(document).ready(function () {
+
+        CheckoutCart();
+        $.ajax({
+            type: 'GET',
+            url: '/GioHang/_Partial_Confirm',
+            success: function (data) {
+                $("#GioHang").html(data);
+            }
         });
+    });
 </script>

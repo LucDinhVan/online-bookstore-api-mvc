@@ -108,8 +108,8 @@ namespace TriThucOnline_TTN.Models
         public float discount { get; set;}
         public float max_value { get; set;}
         public int count { get; set;}
-        public float valid_from { get; set;}
-        public float valid_until { get; set;}
+        public string valid_from { get; set;}
+        public string valid_until { get; set;}
         public bool is_enable { get; set; }
     }
 
@@ -150,5 +150,19 @@ namespace TriThucOnline_TTN.Models
     public class OrderDetails
     {
         public List<OrderDetail> order_details { get; set; }
+    }
+    public class Cart
+    {
+        public int id;
+        public int quantity;
+        public int user_id;
+        public int book_id;
+        public string book_name;
+        public float total;
+        public List<Cart> carts { get; set; }
+    }
+    public class Carts
+    {
+        public List<Cart> carts { get; set; }
     }
 }

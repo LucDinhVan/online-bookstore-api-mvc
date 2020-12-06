@@ -8,14 +8,16 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Mvc;
+using TriThucOnline_TTN.Repository;
 using TriThucOnline_TTN.Models;
+using RestSharp;
 
 namespace TriThucOnline_TTN.Controllers
 {
     public class DAUSACHController : Controller
     {
         private SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
-        
+
         // GET: DAUSACH/Details/5
         public ActionResult Details(int? id)
         {
@@ -29,8 +31,6 @@ namespace TriThucOnline_TTN.Controllers
             //    return HttpNotFound();
             //}
             //return View(dAUSACH);
-
-
 
             List<Book> books = null;
             string jsonData = "";
@@ -77,58 +77,37 @@ namespace TriThucOnline_TTN.Controllers
         [HttpPost]
         public JsonResult AddToCart(int? id, int quantity)
         {
+            if (Session["TaiKhoan"] == null || Session["TaiKhoan"].ToString() == "")
+            {
+                return Json(new { Success = false, ItemAmount = 10, ErrorMsg = "Bạn chưa đăng nhập" });
+            }
             bool success = true;
             string error = "";
-            List<CartItem> listCartItem;
-            //Process Add To Cart
-            if (Session["ShoppingCart"] == null)
+            if(id != null)
             {
-                //Create New Shopping Cart Session
-                listCartItem = new List<CartItem>();
-                listCartItem.Add(new CartItem { Quality = quantity, productOrder = db.DAUSACHes.Find(id) });
-                Session["ShoppingCart"] = listCartItem;
-            }
-            else
-            {
-                bool flag = false;
-                listCartItem = (List<CartItem>)Session["ShoppingCart"];
-                foreach (CartItem item in listCartItem)
+                Cart cart = null;
+                // GET
+
+                Extensions.request = new RestRequest($"carts", Method.POST);
+                var data = JsonConvert.SerializeObject(new { book_id = id, quantity = quantity });
+                Extensions.request.AddParameter("application/json", data, ParameterType.RequestBody);
+                var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+                responseTask.Wait();
+
+                var result = responseTask.Result;
+                if (result.IsSuccessful)
                 {
-                    if (item.productOrder.MaSach == id)
-                    {
-                        flag = true;
-                        if (db.DAUSACHes.Find(id).SoLuongTon < quantity+item.Quality)
-                        {
-                            success = false;
-                            error = "Rất tiếc, kho hàng của sản phẩm không đủ";
-                            break;
-                        }
-                        item.Quality += quantity;
-                        break;
-                    }
+                    cart = JsonConvert.DeserializeObject<Cart>(result.Content);
                 }
-                if (!flag)
+                else
                 {
-                    if (db.DAUSACHes.Find(id).SoLuongTon < quantity)
-                    {
-                        success = false;
-                        error = "Rất tiếc, kho hàng của sản phẩm không đủ";
-                    }
-                    else
-                        listCartItem.Add(new CartItem { Quality = quantity, productOrder = db.DAUSACHes.Find(id) });
+                    success = false;
+                    dynamic obj = JsonConvert.DeserializeObject<Object>(result.Content);
+                    error = obj.message.ToString();
                 }
-                    
-                Session["ShoppingCart"] = listCartItem;
             }
 
-            //Count item in shopping cart
-            int cartcount = 0;
-            List<CartItem> ls = (List<CartItem>)Session["ShoppingCart"];
-            foreach (CartItem item in ls)
-            {
-                cartcount += item.Quality;
-            }
-            return Json(new { Success = success, ItemAmount = cartcount, ErrorMsg = error });
+            return Json(new { Success = success, ItemAmount = 10, ErrorMsg = error });
         }
 
         protected override void Dispose(bool disposing)
