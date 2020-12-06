@@ -1,6 +1,6 @@
 ﻿@using PagedList.Mvc;
 @using PagedList;
-@model PagedList.PagedList<TriThucOnline_TTN.Models.KHACHHANG>
+@model PagedList.PagedList<TriThucOnline_TTN.Models.User>
 
 <div class="table-responsive">
     <table class="table table-condensed table-bordered table-striped table-hover">
@@ -19,7 +19,12 @@
                 <th>
                     <span class="text-primary">SĐT khách hàng</span>
                 </th>
-
+                <th>
+                    <span class="text-primary">Email</span>
+                </th>
+                <th>
+                    <span class="text-primary">Địa chỉ cụ thể</span>
+                </th>
                 <th>
                     <span class="text-primary">Chức năng</span>
                 </th>
@@ -28,38 +33,57 @@
         <tbody>
             @foreach (var item in Model)
             {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.MaKH)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TenKH)
-                </td>
-                <td>
-                    <img src="@Url.Content("~/Content/HinhAnhKH/"+item.PicUser)" class="img-responsive" style="width: 150px; height: auto" />
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.SDT)
-                </td>
-                <td>
-                    @*<a href="@Url.Action("Edit", new { @MaKH = item.MaKH })">
-            <i class="far fa-edit"></i>
-        </a>*@
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.name)
+                    </td>
+                    <td>
+                        <img src="@item.picture" class="img-responsive" style="width: 150px; height: auto" />
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.phone)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.email)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.address)
+                    </td>
+                    <td>
+                        @*<a href="@Url.Action("Edit", new { @MaKH = item.id })">
+                                <i class="far fa-edit"></i>
+                            </a>*@
 
-                    <a onclick="ChiTietKH('@item.MaKH')">
-                        <i class="fas fa-info-circle"></i>
-                    </a>
-                    <button onclick="delete_article('@item.MaKH')" style="color:red">
-                        <i class="far fa-trash-alt"></i>
-                    </button>
-                    <button onclick="ChiTietDHKH('@item.MaKH')" style="color:darkgreen">
-                        <i class="fas fa-cart-arrow-down"></i>
-                    </button>
-                </td>
-            </tr>
+                        <a onclick="ChiTietKH('@item.id')">
+                            <i class="fas fa-info-circle"></i>
+                        </a>
+                        <button onclick="delete_article('@item.id', @Model.PageNumber)" style="color:red">
+                            <i class="far fa-trash-alt"></i>
+                        </button>
+                        <button onclick="ChiTietDHKH('@item.id')" style="color:darkgreen">
+                            <i class="fas fa-cart-arrow-down"></i>
+                        </button>
+                    </td>
+                </tr>
             }
 
 
         </tbody>
     </table>
 </div>
+    Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)/ @Model.PageCount
+    <div class="MenuTrang">
+        @Html.PagedListPager(Model, page => Url.Action("IndexPartial", new { page = page }),
+    PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", UpdateTargetId = "Users" })
+    )
+    </div>
+<script>
+    $(document).ready(function () {
+        $("html, body").animate({ scrollTop: 0 }, 500);
+        $('.MenuTrang').find('li').addClass('page-item');
+        $('.MenuTrang').find('li').find('a').addClass('page-link');
+    })
+</script>

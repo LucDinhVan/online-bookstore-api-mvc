@@ -8,6 +8,8 @@ using TriThucOnline_TTN.Models;
 using PagedList;
 using PagedList.Mvc;
 using System.IO;
+using RestSharp;
+using Newtonsoft.Json;
 
 namespace TriThucOnline_TTN.Controllers
 {
@@ -15,143 +17,142 @@ namespace TriThucOnline_TTN.Controllers
     public class QuanLyTacGiaController : Controller
     {
         // GET: QuanLyTacGia
-        SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
         public ActionResult Index(int? page)
         {
-            int pageNumber = (page ?? 1);
-            int pageSize = 10;
-            return View(db.TACGIAs.ToList().OrderBy(n => n.MaTG).ToPagedList(pageNumber, pageSize));
-        }
-        public PartialViewResult IndexPartial(int? page)
-        {
-            int pageNumber = (page ?? 1);
-            int pageSize = 10;
-            return PartialView(db.TACGIAs.ToList().OrderBy(n => n.MaTG).ToPagedList(pageNumber, pageSize));
-        }
-        /// <summary>
-        /// Tao moi
-        /// </summary>
-        /// <returns></returns>
-        public ActionResult Create()
-        {
+            Authors authors = null;
+            // GET
 
-            return View(new TACGIA());
-        }
-        [HttpPost]
-        [ValidateInput(false)]
-        public ActionResult Create(TACGIA tg, HttpPostedFileBase fileUpload)
-        {
-            //kiểm tra đường dẫn ảnh
-            if (fileUpload == null)
+            Extensions.request = new RestRequest($"authors", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                ViewBag.ThongBao = "Hãy chọn ảnh tác giả!";
-                return View(tg);
-            }
-            //Thêm vào cơ sở dữ liệu
-            if (ModelState.IsValid)
-            {
-                //Lưu tên file
-                var fileName = Path.GetFileName(fileUpload.FileName);
-                //Lưu đường dẫn của file
-                var path = Path.Combine(Server.MapPath("~/Content/HinhAnhTG"), fileName);
-                //Kiểm tra hình ảnh đã tồn tại chưa
-                if (System.IO.File.Exists(path))
-                {
-                    ViewBag.ThongBao = "Hình ảnh đã tồn tại";
-                }
-                else
-                {
-                    fileUpload.SaveAs(path);
-                }
-                tg.PicTG = fileUpload.FileName;
-                db.TACGIAs.Add(tg);
-                db.SaveChanges();
-                ViewBag.ThongBao = "Thêm mới thành công";
+                authors = JsonConvert.DeserializeObject<Authors>(result.Content);
             }
             else
             {
-                ViewBag.ThongBao = "Thêm mới thất bại";
+
             }
-            return RedirectToAction("Index");
+            int pageNumber = (page ?? 1);
+            int pageSize = 10;
+            return View(authors.authors.ToList().OrderBy(n => n.id).ToPagedList(pageNumber, pageSize));
         }
-        /// <summary>
-        /// Chinh Sua
-        /// </summary>
-        /// <param name="MaSach"></param>
-        /// <returns></returns>
-        [HttpGet]
-        public ActionResult Edit(int MaTacGia)
+        public PartialViewResult IndexPartial(int? page)
         {
-            //Lấy ra đối tượng sách theo mã 
-            TACGIA tg = db.TACGIAs.SingleOrDefault(n => n.MaTG == MaTacGia);
-            if (tg == null)
+            Authors authors = null;
+            // GET
+
+            Extensions.request = new RestRequest($"authors", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                Response.StatusCode = 404;
-                return null;
+                authors = JsonConvert.DeserializeObject<Authors>(result.Content);
             }
-
-            return View(tg);
-        }
-        [HttpPost]
-        [ValidateInput(false)]
-        public ActionResult Edit(TACGIA tg, HttpPostedFileBase fileUpload)
-        {
-            if (fileUpload != null)
+            else
             {
-                //Lưu tên file
-                var fileName = Path.GetFileName(fileUpload.FileName);
-                //Lưu đường dẫn của file
-                var path = Path.Combine(Server.MapPath("~/Content/HinhAnhTG"), fileName);
-                if (!System.IO.File.Exists(path))
-                {
-                    fileUpload.SaveAs(path);
-                }
-                tg.PicTG = fileName;
+
             }
-            //Thêm vào cơ sở dữ liệu
-            if (ModelState.IsValid)
+            int pageNumber = (page ?? 1);
+            int pageSize = 10;
+            return PartialView(authors.authors.ToList().OrderBy(n => n.id).ToPagedList(pageNumber, pageSize));
+        }
+        public PartialViewResult XemCTTGPartial(int? id)
+        {
+            Author publisher = null;
+            // GET
+
+            Extensions.request = new RestRequest($"authors/{id}", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                //Thực hiện cập nhận trong model
-                db.Entry(tg).State = System.Data.Entity.EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                publisher = JsonConvert.DeserializeObject<Author>(result.Content);
             }
+            else
+            {
 
-            return View(tg);
-
+            }
+            return PartialView(publisher);
         }
 
-        [HttpPost]
-        public JsonResult XemCTTG(int matg)
-        {
-            TempData["matg"] = matg;
-            return Json(new { Url = Url.Action("XemCTTGPartial") });
-        }
-        public PartialViewResult XemCTTGPartial()
-        {
-            int maTG = (int)TempData["matg"];
-            var lstTG = db.TACGIAs.Where(n => n.MaTG == maTG).ToList();
-            return PartialView(lstTG);
-        }
-
-        /////////////////////
         [HttpPost]
         public JsonResult Remove(int id)
         {
-            TACGIA tg = db.TACGIAs.SingleOrDefault(n => n.MaTG == id);
-            if (tg == null)
+            Extensions.request = new RestRequest($"authors/{id}", Method.DELETE);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                Response.StatusCode = 404;
+                return Json(new { Url = Url.Action("IndexPartial") });
+            }
+            else
+            {
+                Response.StatusCode = 500;
                 return null;
             }
-            var path = Path.Combine(Server.MapPath("~/Content/HinhAnhTG"), tg.PicTG);
-            if (System.IO.File.Exists(path))
+        }
+
+        [HttpPost]
+        public JsonResult Update(int id, string name, string picture, string info)
+        {
+            Extensions.request = new RestRequest($"authors/{id}", Method.PUT);
+
+            var data = JsonConvert.SerializeObject(new { id = id, name = name, picture=picture, info=info });
+            Extensions.request.AddParameter("application/json", data, ParameterType.RequestBody);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                System.IO.File.Delete(path);
+                return Json(new { Url = Url.Action("IndexPartial") });
             }
-            db.TACGIAs.Remove(tg);
-            db.SaveChanges();
-            return Json(new { Url = Url.Action("IndexPartial") });
+            else
+            {
+                Response.StatusCode = 500;
+                Response.Write(result.Content);
+                return null;
+            }
+
+        }
+
+        [HttpPost]
+        public JsonResult Add(string name, string picture, string info)
+        {
+            Extensions.request = new RestRequest($"authors", Method.POST);
+
+            var data = JsonConvert.SerializeObject(new {name = name, picture=picture, info=info });
+            Extensions.request.AddParameter("application/json", data, ParameterType.RequestBody);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                return Json(new { Url = Url.Action("IndexPartial") });
+            }
+            else
+            {
+                Response.StatusCode = 500;
+                Response.Write(result.Content);
+                return null;
+            }
+
         }
     }
 }

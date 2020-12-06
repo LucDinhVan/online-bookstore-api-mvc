@@ -1,6 +1,6 @@
 ﻿@using PagedList.Mvc;
 @using PagedList;
-@model PagedList.PagedList<TriThucOnline_TTN.Models.THELOAI>
+@model PagedList.PagedList<TriThucOnline_TTN.Models.Category>
 
 <div class="table-responsive">
     <table class="table table-condensed table-bordered table-striped table-hover">
@@ -23,20 +23,22 @@
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.MaTL)
+                        @Html.DisplayFor(modelItem => item.id)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.TenTL)
+                        @Html.DisplayFor(modelItem => item.name)
                     </td>
                     <td>
-                        <a href="@Url.Action("Edit", new { @MaTheLoai = item.MaTL })">
+                        <!-- <a href="@Url.Action("Edit", new { @MaNXB = item.id })">
                             <i class="far fa-edit"></i>
-                        </a>
-                    
-                        <a onclick="ChiTietCD('@item.MaTL')">
+                        </a> -->
+                        <button onclick="edit('@item.id', '@item.name')" style="color:blue">
+                            <i class="far fa-edit"></i>
+                        </button>
+                        <button onclick="ChiTietTheLoai('@item.id')">
                             <i class="fas fa-info-circle"></i>
-                        </a>
-                        <button onclick="delete_article('@item.MaTL')" style="color:red">
+                        </button>
+                        <button onclick="delete_article('@item.id', @Model.PageNumber)" style="color:red">
                             <i class="far fa-trash-alt"></i>
                         </button>
                     </td>

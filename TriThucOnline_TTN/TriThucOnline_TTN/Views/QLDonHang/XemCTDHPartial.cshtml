@@ -1,30 +1,145 @@
-﻿    @using TriThucOnline_TTN.Models;
-@model List<CT_DONHANG>
-
-<table class="table table-bordered table-hover table-condensed table-striped">
+﻿@using TriThucOnline_TTN;
+@using RestSharp
+@using TriThucOnline_TTN.Models;
+@using Newtonsoft.Json;
+@model Order
+@{
+    float tongTien = 0;
+    int soLuongTong = 0;
+    float discountValue = 0;
+    int ts = Convert.ToInt32(Model.required_date);
+    DateTime dt = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(ts).ToLocalTime();
+    string formattedDate = dt.ToString("dd-MM-yyyy");
+    int order_status = 0;
+    switch (Model.status)
+    {
+        case "Đặt hàng":
+            // Use the text block below to separate html elements from code
+            order_status = 0;
+            break;  // Always break each case
+        case "Đóng gói":
+            order_status = 1;
+            break;
+        case "Vận chuyển":
+            order_status = 2;
+            break;
+        case "Nhận hàng":
+            order_status = 3;
+            break;
+        case "Hủy":
+            order_status = 4;
+            break;
+        default:
+            order_status = 0;
+            break;
+    }
+}
+<p id="customer_name">Khách hàng: </p>
+<p id="customer_address">Địa chỉ giao hàng: </p>
+<p id="customer_phone">Số điện thoại liên hệ: </p>
+<p>Ngày yêu cầu hàng: <b>@formattedDate</b></p>
+<p>Ghi chú: <b>@Model.comment</b></p>
+<label>Trạng thái</label>
+<select class="form-control" style="width:250px" id="order_status">
+    <option value="0">Đặt hàng</option>
+    <option value="1">Đóng gói</option>
+    <option value="2">Vận chuyển</option>
+    <option value="3">Nhận hàng</option>
+    <option value="4">Hủy</option>
+</select>
+<br />
+<span>Chi tiết</span>
+<table class="table table-bordered table-hover">
     <thead>
         <tr>
             <th>Mã sách:</th>
             <th>Tên sách:</th>
             <th>Ảnh bìa:</th>
             <th>Số lượng:</th>
-            <th>Giá tiền:</th>
+            <th>Thành tiền:</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.order_details)
         {
-        <tr>
-            <td>@item.DAUSACH.MaSach</td>
-            <td>@item.DAUSACH.TenSach</td>
-            <td>
-                <img src="@Url.Content("~/Content/HinhAnhSP/"+item.DAUSACH.PicBook)" class="img-responsive" style="width: 150px; height: auto">
-            </td>
-            <td>@item.SoLuong</td>
-            <td>@item.DonGia</td>
-        </tr>
+            <tr>
+                <td style="width:80px">@item.book_id</td>
+                @{
+                    Book book = null;
+                    // GET
+
+                    Extensions.request = new RestRequest($"books/" + @item.book_id, Method.GET);
+
+                    var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+                    responseTask.Wait();
+
+                    var result = responseTask.Result;
+                    if (result.IsSuccessful)
+                    {
+                        book = JsonConvert.DeserializeObject<Book>(result.Content);
+                        <td style="width:250px"><a href="#"> @book.title</a></td>
+                        <td style="width:150px"><img src="@book.picture" class="img-responsive" style="width: 150px; height: auto"></td>
+                    }
+                    else
+                    {
+                        <td></td>
+                        <td></td>
+                    }
+                }
+                <td style="width:40px">@item.quantity</td>
+                <td style="width:140px">@string.Format("{0:0,0}", item.quantity*item.price) VNĐ</td>
+                @{
+                    soLuongTong+=Convert.ToInt16(item.quantity);
+                    tongTien+=Convert.ToInt16(item.quantity)*item.price;
+                }
+            </tr>
         }
+        <tr>
+            <td></td>
+            <td></td>
+            <td><b>Tổng (tạm tính):</b></td>
+            <td><b>@soLuongTong</b></td>
+            <td><b>@string.Format("{0:0,0}", tongTien) VNĐ</b></td>
+        </tr>
+        <tr>
+            @{
+                Coupon coupon = null;
+                // GET
+
+                Extensions.request = new RestRequest($"coupons/" + ViewBag.KhuyenMai, Method.GET);
+
+                var responseTask1 = Extensions.client.ExecuteAsync(Extensions.request);
+                responseTask1.Wait();
+
+                var result1 = responseTask1.Result;
+                if (result1.IsSuccessful)
+                {
+                    coupon = JsonConvert.DeserializeObject<Coupon>(result1.Content);
+                    discountValue = coupon.discount;
+                }
+                else
+                {
+                    
+                }
+            }
+            <td></td>
+            <td></td>
+            <td><b>Khuyến mãi:</b></td>
+            <td style="color:red"><b>@Model.coupon_code</b></td>
+            <td><b>-@string.Format("{0:0,0}", (discountValue*tongTien)/100) VNĐ</b></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td><b>Tổng:</b></td>
+            <td></td>
+            <td><b>@string.Format("{0:0,0}", Model.total) VNĐ</b></td>
+        </tr>
     </tbody>
 </table>
-
-
+<script>
+    $(document).ready(function(){
+        console.log("@order_status")
+        Array.from(document.getElementById("order_status").options).forEach((element)=>{if(element.value == "@order_status") element.selected = true})
+    });
+</script>

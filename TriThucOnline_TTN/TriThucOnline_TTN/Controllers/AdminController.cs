@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using RestSharp;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -13,8 +16,6 @@ namespace TriThucOnline_TTN.Controllers
 {
     public class AdminController : Controller
     {
-        private SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
-
         [Authorize]
         public ActionResult Index()
         {
@@ -24,7 +25,7 @@ namespace TriThucOnline_TTN.Controllers
         [HttpGet]
         public ActionResult Login()
         {
-            if(Request.Cookies[".ASPXAUTH"] != null)
+            if (Request.Cookies[".ASPXAUTH"] != null)
             {
                 return RedirectToAction("Index");
             }
@@ -43,13 +44,28 @@ namespace TriThucOnline_TTN.Controllers
             }
             string username = form["username"].ToString();
             string password = form["password"].ToString();
-            var usr = (from u in db.QUANTRIVIENs
-                       where u.Username == username && u.Password == password
-                       select u).FirstOrDefault();
-            if (usr != null)
+
+
+
+
+            // POST
+            var loginObj = JsonConvert.SerializeObject(new
             {
-                //create seession/ token for loged in user
-                FormsAuthentication.SetAuthCookie(usr.Username, false);
+                username = username,
+                password = password
+            });
+
+            Extensions.request = new RestRequest("admin/login", Method.POST);
+            Extensions.request.AddHeader("Content-Type", "application/json");
+            Extensions.request.AddParameter("application/json", loginObj, ParameterType.RequestBody);
+
+            var responseTask = Extensions.client.ExecutePostAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                FormsAuthentication.SetAuthCookie(username, false);
 
                 if (!string.IsNullOrEmpty(returnurl))
                 {
@@ -57,15 +73,19 @@ namespace TriThucOnline_TTN.Controllers
 
                 }
                 return RedirectToAction("Index");
-
+            }
+            else
+            {
+                TempData["Message"] = "Tên tài khoản hoặc mật khẩu không đúng!";
 
             }
-            TempData["Message"] = "Tên tài khoản hoặc mật khẩu không đúng!";
-            //
             return View();
         }
         public ActionResult Logout()
         {
+            Extensions.request = new RestRequest("admin/login", Method.POST);
+
+            var responseTask = Extensions.client.ExecutePostAsync(Extensions.request);
             FormsAuthentication.SignOut();
             return RedirectToAction("Login");
         }

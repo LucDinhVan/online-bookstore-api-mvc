@@ -1,6 +1,6 @@
 ﻿@using PagedList.Mvc;
 @using PagedList;
-@model PagedList.PagedList<TriThucOnline_TTN.Models.KHACHHANG>
+@model PagedList.PagedList<TriThucOnline_TTN.Models.User>
 
 @{
     ViewBag.Title = "Quản lý khách hàng";
@@ -9,108 +9,336 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="~/Content/bootstrap.min.css">
 <link rel="stylesheet" href="~/Content/Register/css/style.css">
-<h2>Quản lý khách hàng</h2>
+<script src="~/Scripts/jquery-3.5.0.min.js"></script>
+<script src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")" type="text/javascript"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<style>
+    .modal-confirm {
+        color: #434e65;
+        width: 525px;
+    }
 
-<p>
-    @*@Html.ActionLink("Create New", "Create")*@
-    @*<a href="@Url.Action("Create")" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i> Thêm khách hàng</a>*@
-</p>
-<div id="Xoa_KH">
+        .modal-confirm .modal-content {
+            padding: 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        .modal-confirm .modal-header {
+            background: #47c9a2;
+            border-bottom: none;
+            position: relative;
+            text-align: center;
+            margin: -20px -20px 0;
+            border-radius: 5px 5px 0 0;
+            padding: 35px;
+        }
+
+        .modal-confirm h4 {
+            text-align: center;
+            font-size: 36px;
+            margin: 10px 0;
+        }
+
+        .modal-confirm .form-control, .modal-confirm .btn {
+            min-height: 40px;
+            border-radius: 3px;
+        }
+
+        .modal-confirm .close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: #fff;
+            text-shadow: none;
+            opacity: 0.5;
+        }
+
+            .modal-confirm .close:hover {
+                opacity: 0.8;
+            }
+
+        .modal-confirm .icon-box {
+            color: #fff;
+            width: 95px;
+            height: 95px;
+            display: inline-block;
+            border-radius: 50%;
+            z-index: 9;
+            border: 5px solid #fff;
+            padding: 15px;
+            text-align: center;
+        }
+
+            .modal-confirm .icon-box i {
+                font-size: 64px;
+                margin: -4px 0 0 -4px;
+            }
+
+        .modal-confirm.modal-dialog {
+            margin-top: 80px;
+        }
+
+        .modal-confirm .btn, .modal-confirm .btn:active {
+            color: #fff;
+            border-radius: 4px;
+            background: #eeb711 !important;
+            text-decoration: none;
+            transition: all 0.4s;
+            line-height: normal;
+            border-radius: 30px;
+            margin-top: 10px;
+            padding: 6px 20px;
+            border: none;
+        }
+
+            .modal-confirm .btn:hover, .modal-confirm .btn:focus {
+                background: #eda645 !important;
+                outline: none;
+            }
+
+            .modal-confirm .btn span {
+                margin: 1px 3px 0;
+                float: left;
+            }
+
+            .modal-confirm .btn i {
+                margin-left: 1px;
+                font-size: 20px;
+                float: right;
+            }
+
+    .modal-confirm-delete {
+        color: #636363;
+        width: 400px;
+        margin: 30px auto;
+    }
+
+        .modal-confirm-delete .modal-content {
+            padding: 20px;
+            border-radius: 5px;
+            border: none;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .modal-confirm-delete .modal-header {
+            border-bottom: none;
+            position: relative;
+        }
+
+        .modal-confirm-delete h4 {
+            text-align: center;
+            font-size: 26px;
+            margin: 30px 0 -10px;
+        }
+
+        .modal-confirm-delete .close {
+            position: absolute;
+            top: -5px;
+            right: -2px;
+        }
+
+        .modal-confirm-delete .modal-body {
+            color: #999;
+        }
+
+        .modal-confirm-delete .modal-footer {
+            border: none;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 13px;
+            padding: 10px 15px 25px;
+        }
+
+            .modal-confirm-delete .modal-footer a {
+                color: #999;
+            }
+
+        .modal-confirm-delete .icon-box {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            border-radius: 50%;
+            z-index: 9;
+            text-align: center;
+            border: 3px solid #f15e5e;
+        }
+
+            .modal-confirm-delete .icon-box i {
+                color: #f15e5e;
+                font-size: 46px;
+                display: inline-block;
+                margin-top: 13px;
+            }
+
+        .modal-confirm-delete .btn {
+            color: #fff;
+            border-radius: 4px;
+            background: #60c7c1;
+            text-decoration: none;
+            transition: all 0.4s;
+            line-height: normal;
+            min-width: 120px;
+            border: none;
+            min-height: 40px;
+            border-radius: 3px;
+            margin: 0 5px;
+            outline: none !important;
+        }
+
+        .modal-confirm-delete .btn-info {
+            background: #c1c1c1;
+        }
+
+            .modal-confirm-delete .btn-info:hover, .modal-confirm .btn-info:focus {
+                background: #a8a8a8;
+            }
+
+        .modal-confirm-delete .btn-danger {
+            background: #f15e5e;
+        }
+
+            .modal-confirm-delete .btn-danger:hover, .modal-confirm .btn-danger:focus {
+                background: #ee3535;
+            }
+
+    .trigger-btn {
+        display: inline-block;
+        margin: 100px auto;
+    }
+</style>
+<h2>Quản lý khách hàng</h2>
+<div id="Users">
     @{ Html.RenderPartial("IndexPartial");}
 </div>
-@* Tạo link liên kết các trang*@
-    Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber)/ @Model.PageCount
-    <div class="MenuTrang">
-        @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }))
-    </div>
-    <style>
-        .MenuTrang li {
-            display: inline;
-        }
-    </style>
-    <script>
-        function delete_article(Id) {
-            var answer = confirm("Bạn có chắc muốn xóa khách hàng này?");
-            if (answer) {
-                //alert('Xác nhận xóa');
-                Remove(Id);
+<style>
+    .MenuTrang li {
+        display: inline;
+    }
+</style>
+<script>
+    function delete_article(Id, pageNumber) {
+        $("#confirmModal").modal();
+        $('#submit-del').click(function () {
+            //alert('Xác nhận xóa');
+            $("#confirmModal").modal('hide');
+            Remove(Id, pageNumber);
+        });
+    }
+
+    function Remove(Id, pageNumber) {
+        $.ajax({
+            type: 'POST',
+            url: '/QuanLyKH/Remove',
+            data: { id: Id },
+            success: function (data) {
+                $("#deletedModal").modal();
+                $.get(data.Url + "/?page=" + pageNumber, function (partial) {
+                    $("#Users").html(partial);
+                });
+            },
+            error: function () {
+                alert("Đã có lỗi xảy ra khi xóa");
             }
-        }
+        });
+    }
 
-        function Remove(Id) {
-            $.ajax({
-                type: 'POST',
-                url: '/QuanLyKH/Remove',
-                data: { id: Id },
-                success: function (data) {
-                    $.post(data.Url, function (partial) {
-                        $("#Xoa_KH").html(partial);
-                    });
-                }
+    function ChiTietKH(makh) {
+        $.ajax({
+            type: 'GET',
+            url: '/QuanLyKH/XemCTKHPartial?id=' + makh,
+            success: function (data) {
+                $("#All_Dialog").html(data)
+            }
+        });
+        $('#myModal').on('shown.bs.modal', function () {
+            $(this).find('.modal-dialog').css({
+                width: '100%',
+                height: 'auto',
+                'max-height': '100%',
+                'max-width': '1000px',
             });
-        }
+        });
+        $("#myModal").modal();
+    }
 
-        function ChiTietKH(makh) {
-            $.ajax({
-                type: 'POST',
-                url: '/QuanLyKH/XemCTKH',
-                data: { makh: makh },
-                success: function (data) {
-                    $.post(data.Url, function (partial) {
-                        $("#All_Dialog").html(partial)
-                    });
-                }
+    function ChiTietDHKH(makh) {
+        $.ajax({
+            type: 'GET',
+            url: '/QuanLyKH/XemCTDHKHPartial?id='+makh,
+            success: function (data) {
+                $("#All_Dialog").html(data)
+            }
+        });
+        $('#myModal').on('shown.bs.modal', function () {
+            $(this).find('.modal-dialog').css({
+                width: '100%',
+                height: 'auto',
+                'max-height': '100%',
+                'max-width': '1000px',
             });
-            $('#myModal').on('shown.bs.modal', function () {
-                $(this).find('.modal-dialog').css({
-                    width: '100%',
-                    height: 'auto',
-                    'max-height': '100%',
-                    'max-width': '1000px',
-                });
-            });
-            $("#myModal").modal();
-        }
+        });
+        $("#myModal").modal();
+    }
+</script>
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Chi tiết khách hàng</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                @* nội dung bên trong all_dialog *@
+                <div id="All_Dialog"></div>
 
-        function ChiTietDHKH(makh) {
-            $.ajax({
-                type: 'POST',
-                url: '/QuanLyKH/XemCTDHKH',
-                data: { makh: makh },
-                success: function (data) {
-                    $.post(data.Url, function (partial) {
-                        $("#All_Dialog").html(partial)
-                    });
-                }
-            });
-            $('#myModal').on('shown.bs.modal', function () {
-                $(this).find('.modal-dialog').css({
-                    width: '100%',
-                    height: 'auto',
-                    'max-height': '100%',
-                    'max-width': '1000px',
-                });
-            });
-            $("#myModal").modal();
-        }
-    </script>
-    @* đây là cái bảng dialog *@
-    <div id="myModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Chi tiết khách hàng</h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    @* nội dung bên trong all_dialog *@
-                    <div id="All_Dialog"></div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>
+</div>
+<!-- Deleted Modal HTML -->
+<div id="deletedModal" class="modal fade">
+    <div class="modal-dialog modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <div class="icon-box">
+                    <i class="material-icons">&#xE876;</i>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body text-center">
+                <h4>Thành công!</h4>
+                <p>Đã cập nhật thành công</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Delete Confirm Modal HTML -->
+<div id="confirmModal" class="modal fade">
+    <div class="modal-dialog modal-confirm-delete">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="icon-box">
+                    <i class="material-icons">&#xE5CD;</i>
+                </div>
+                <h4 class="modal-title">Bạn có chắc xóa?</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có thực sự muốn xóa các bản ghi này không? Không thể hoàn tác quá trình này.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="submit-del">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>

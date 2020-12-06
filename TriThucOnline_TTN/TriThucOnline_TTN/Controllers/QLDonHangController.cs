@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
 using System.Web.Mvc;
 using TriThucOnline_TTN.Models;
 using PagedList;
-using PagedList.Mvc;
-using System.Net;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using System.IO;
-using System.Web.UI;
 using System.Web.UI.WebControls;
+using Newtonsoft.Json;
+using RestSharp;
+using System.Collections.Generic;
 
 namespace TriThucOnline_TTN.Controllers
 {
@@ -19,119 +13,178 @@ namespace TriThucOnline_TTN.Controllers
     public class QLDonHangController : Controller
     {
         // GET: QLDonHang
-        SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
         public ActionResult Index(int? page)
         {
+            Orders orders = null;
+            // GET
+
+            Extensions.request = new RestRequest($"orders?name", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                orders = JsonConvert.DeserializeObject<Orders>(result.Content);
+            }
+            else
+            {
+
+            }
             int pageNumber = (page ?? 1);
             int pageSize = 10;
-            return View(db.DONHANGs.ToList().OrderBy(n => n.MaDH).ToPagedList(pageNumber, pageSize));
+            return View(orders.orders.ToList().OrderByDescending(n => n.id).ToPagedList(pageNumber, pageSize));
         }
         public PartialViewResult IndexPartial(int? page)
         {
+            Orders orders = null;
+            // GET
+
+            Extensions.request = new RestRequest($"orders?name", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                orders = JsonConvert.DeserializeObject<Orders>(result.Content);
+            }
+            else
+            {
+
+            }
             int pageNumber = (page ?? 1);
             int pageSize = 10;
-            return PartialView(db.DONHANGs.ToList().OrderBy(n => n.MaDH).ToPagedList(pageNumber, pageSize));
+            return PartialView(orders.orders.ToList().OrderByDescending(n => n.id).ToPagedList(pageNumber, pageSize));
         }
+
         [HttpPost]
         public JsonResult Remove(int id)
         {
-            DONHANG dh = db.DONHANGs.SingleOrDefault(n => n.MaDH == id);
-            if (dh == null)
+            Extensions.request = new RestRequest($"orders/{id}", Method.DELETE);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                Response.StatusCode = 404;
+                return Json(new { Url = Url.Action("IndexPartial") });
+            }
+            else
+            {
+                Response.StatusCode = 500;
                 return null;
             }
-            db.DONHANGs.Remove(dh);
-            db.SaveChanges();
-            return Json(new { Url = Url.Action("IndexPartial") });
         }
 
-        public ActionResult Edit(int? madh)
+        public PartialViewResult XemCTDHPartial(int? id)
         {
-            ////Lấy ra đối tượng sách theo mã 
-            //DONHANG cd = db.DONHANGs.SingleOrDefault(n => n.MaDH == madh);
-            //if (cd == null)
-            //{
-            //    Response.StatusCode = 404;
-            //    return null;
-            //}
-            //return View();
-            if (madh == null)
+            Order details = null;
+            // GET
+
+            Extensions.request = new RestRequest($"orders/{id}", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                details = JsonConvert.DeserializeObject<Order>(result.Content);
+                ViewBag.KhuyenMai = details.coupon_code;
             }
-            DONHANG book = db.DONHANGs.SingleOrDefault(s => s.MaDH == madh);
-            return View(book);
+            else
+            {
+
+            }
+            return PartialView(details);
         }
 
         [HttpPost]
-        public ActionResult Edit(int madh, FormCollection f)
+        public JsonResult Update(int id, int status)
         {
-            ////Thêm vào cơ sở dữ liệu
-            //if (ModelState.IsValid)
-            //{
-            //    //Thực hiện cập nhận trong model
-            //    db.Entry(dh).State = System.Data.Entity.EntityState.Modified;
-            //    db.SaveChanges();
-            //}
-
-            //return RedirectToAction("Index");
-            var bookUpdate = db.DONHANGs.Find(madh);
-            if (TryUpdateModel(bookUpdate, "", new string[] { /*"NgayGiao", "NgayDat",*/ "TrangThaiThanhToan", "TrangThaiGiao"/*, "MaKH"*/ }))
+            Extensions.request = new RestRequest($"orders/{id}", Method.PUT);
+            string stt = "";
+            switch (status)
             {
-                try
-                {
-                    db.Entry(bookUpdate).State = EntityState.Modified;
-                    db.SaveChanges();
-                }
-                catch (RetryLimitExceededException)
-                {
-                    ModelState.AddModelError("", "Error Save Data");
-                }
+                case 0:
+                    {
+                        stt = "Đặt hàng";
+                        break;
+                    }
+                case 1:
+                    {
+                        stt = "Đóng gói";
+                        break;
+                    }
+                case 2:
+                    {
+                        stt = "Vận chuyển";
+                        break;
+                    }
+                case 3:
+                    {
+                        stt = "Nhận hàng";
+                        break;
+                    }
+                case 4:
+                    {
+                        stt = "Hủy";
+                        break;
+                    }
+                default:
+                    stt = "Đặt hàng";
+                    break;
             }
-            return RedirectToAction("Index");
-        }
+            var data = JsonConvert.SerializeObject(new { id = id, status = stt, shipped_date = 1607185187 });
+            Extensions.request.AddParameter("application/json", data, ParameterType.RequestBody);
 
-        [HttpPost]
-        public JsonResult XemCTDH(int madh)
-        {
-            TempData["madh"] = madh;
-            return Json(new { Url = Url.Action("XemCTDHPartial") });
-        }
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
 
-        public PartialViewResult XemCTDHPartial()
-        {
-            int madh=(int)TempData["madh"];
-            var lstCTDH = db.CT_DONHANG.Where(n => n.MaDH == madh).ToList();
-            return PartialView(lstCTDH);
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                return Json(new { Url = Url.Action("IndexPartial") });
+            }
+            else
+            {
+                Response.StatusCode = 500;
+                Response.Write(result.Content);
+                return null;
+            }
+
         }
 
         public ActionResult ExportClientsListToExcel()
         {
-            var products = (from s in db.DONHANGs
-                            select s).ToList();
+            // var grid = new GridView();
+            // grid.DataSource = products;
+            // grid.DataBind();
 
-            var grid = new GridView();
-            grid.DataSource = products;
-            grid.DataBind();
+            // Response.ClearContent();
+            // Response.Buffer = true;
+            // Response.AddHeader("content-disposition", "attachment; filename=DONHANG.xls");
+            // Response.ContentType = "application/ms-excel";
 
-            Response.ClearContent();
-            Response.Buffer = true;
-            Response.AddHeader("content-disposition", "attachment; filename=DONHANG.xls");
-            Response.ContentType = "application/ms-excel";
+            // Response.Charset = "";
+            // StringWriter sw = new StringWriter();
+            // HtmlTextWriter htw = new HtmlTextWriter(sw);
 
-            Response.Charset = "";
-            StringWriter sw = new StringWriter();
-            HtmlTextWriter htw = new HtmlTextWriter(sw);
+            // grid.RenderControl(htw);
 
-            grid.RenderControl(htw);
-
-            Response.Output.Write(sw.ToString());
-            Response.Flush();
-            Response.End();
+            // Response.Output.Write(sw.ToString());
+            // Response.Flush();
+            // Response.End();
 
             return View("MyView");
+        }
 
+        public ActionResult Edit(){
+            return View();
         }
     }
 }

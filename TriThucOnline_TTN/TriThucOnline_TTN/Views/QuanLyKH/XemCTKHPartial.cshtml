@@ -1,10 +1,9 @@
-﻿    @using TriThucOnline_TTN.Models;
-@model List<KHACHHANG>
+﻿@model TriThucOnline_TTN.Models.User
 
 <table class="table table-bordered table-hover table-condensed table-striped">
     <thead>
         <tr>
-            <th>Mã khách hàng:</th>
+            <th>Mã:</th>
             <th>Tên khách hàng:</th>
             <th>Ảnh khách hàng:</th>
             <th>SĐT khách hàng:</th>
@@ -14,19 +13,16 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
-        {
         <tr>
-            <td>@item.MaKH</td>
-            <td>@item.TenKH</td>
+            <td style="width:40px">@Model.id</td>
+            <td>@Model.name</td>
             <td>
-                <img src="@Url.Content("~/Content/HinhAnhKH/"+item.PicUser)" class="img-responsive" style="width: 150px; height: auto">
+                <img src="@Model.picture" class="img-responsive" style="width: 150px; height: auto">
             </td>
-            <td>@item.SDT</td>
-            <td>@item.Email</td>
-            <td>@item.DiaChi</td>
+            <td>@Model.phone</td>
+            <td>@Model.email</td>
+            <td style="width:250px">@Model.address</td>
         </tr>
-        }
     </tbody>
 </table>
 

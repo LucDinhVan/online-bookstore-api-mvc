@@ -6,114 +6,174 @@ using System.Web.Mvc;
 using TriThucOnline_TTN.Models;
 using PagedList;
 using PagedList.Mvc;
+using RestSharp;
+using Newtonsoft.Json;
 
 namespace TriThucOnline_TTN.Controllers
 {
     [Authorize]
     public class QuanLyKhuyenMaiController : Controller
     {
-        // GET: QuanLyKhuyenMai
-        SQL_TriThucOnline_BanSachEntities1 db = new SQL_TriThucOnline_BanSachEntities1();
         public ActionResult Index(int? page)
         {
+            Coupons coupons = null;
+            // GET
+
+            Extensions.request = new RestRequest($"coupons?name", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                coupons = JsonConvert.DeserializeObject<Coupons>(result.Content);
+            }
+            else
+            {
+
+            }
             int pageNumber = (page ?? 1);
             int pageSize = 10;
-            return View(db.KHUYENMAIs.ToList().OrderBy(n => n.MaKM).ToPagedList(pageNumber, pageSize));
+            return View(coupons.coupons.ToList().OrderBy(n => n.id).ToPagedList(pageNumber, pageSize));
         }
+        [HttpGet]
         public PartialViewResult IndexPartial(int? page)
         {
+            Coupons coupons = null;
+            // GET
+
+            Extensions.request = new RestRequest($"coupons?name", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                coupons = JsonConvert.DeserializeObject<Coupons>(result.Content);
+            }
+            else
+            {
+
+            }
             int pageNumber = (page ?? 1);
             int pageSize = 10;
-            return PartialView(db.KHUYENMAIs.ToList().OrderBy(n => n.MaKM).ToPagedList(pageNumber, pageSize));
+            return PartialView(coupons.coupons.ToList().OrderBy(n => n.id).ToPagedList(pageNumber, pageSize));
         }
-        /// <summary>
-        /// Tao moi
-        /// </summary>
-        /// <returns></returns>
-        public ActionResult Create()
+        public PartialViewResult XemCTKMPartial(string code)
         {
-            KHUYENMAI km = new KHUYENMAI();
-            return View(km);
-        }
-        [HttpPost]
-        [ValidateInput(false)]
-        public ActionResult Create(KHUYENMAI voucher)
-        {
-            //Thêm vào cơ sở dữ liệu
-            if (ModelState.IsValid)
+            Coupon coupon = null;
+            // GET
+
+            Extensions.request = new RestRequest($"coupons/{code}", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                db.KHUYENMAIs.Add(voucher);
-                db.SaveChanges();
-                ViewBag.ThongBao = "Thêm mới thành công";
+                coupon = JsonConvert.DeserializeObject<Coupon>(result.Content);
             }
             else
             {
-                ViewBag.ThongBao = "Thêm thất bại";
-                return View(voucher);
+
             }
-            return RedirectToAction("Index");
+            return PartialView(coupon);
         }
 
-        [HttpGet]
-        public ActionResult Edit(string VoucherCode)
-        {
-            //Lấy ra đối tượng sách theo mã 
-            KHUYENMAI voucher = db.KHUYENMAIs.SingleOrDefault(n => n.MaKM == VoucherCode);
-            if (voucher == null)
-            {
-                Response.StatusCode = 404;
-                return null;
-            }
-            ViewBag.SoLanConLai = voucher.SoLanConLai.ToString();
-            return View(voucher);
-        }
         [HttpPost]
-        [ValidateInput(false)]
-        public ActionResult Edit(KHUYENMAI voucher, FormCollection f)
+        public JsonResult Remove(string code)
         {
-            //Thêm vào cơ sở dữ liệu
-            if (ModelState.IsValid)
+            Extensions.request = new RestRequest($"coupons/{code}", Method.DELETE);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                //Thực hiện cập nhận trong model
-                db.Entry(voucher).State = System.Data.Entity.EntityState.Modified;
-                db.SaveChanges();
+                return Json(new { Url = Url.Action("IndexPartial") });
             }
             else
             {
-                ViewBag.ThongBao = "Lỗi";
-                return View(voucher);
-            }
-
-            return RedirectToAction("Index");
-
-        }
-
-        [HttpPost]
-        public JsonResult XemCTKM(string makm)
-        {
-            TempData["makm"] = makm;
-            return Json(new { Url = Url.Action("XemCTKMPartial") });
-        }
-        public PartialViewResult XemCTKMPartial()
-        {
-            string maKM = (string)TempData["makm"];
-            var lstKM = db.KHUYENMAIs.Where(n => n.MaKM == maKM).ToList();
-            return PartialView(lstKM);
-        }
-
-        /////////////////////
-        [HttpPost]
-        public JsonResult Remove(string id)
-        {
-            KHUYENMAI km = db.KHUYENMAIs.SingleOrDefault(n => n.MaKM == id);
-            if (km == null)
-            {
-                Response.StatusCode = 404;
+                Response.StatusCode = 500;
                 return null;
             }
-            db.KHUYENMAIs.Remove(km);
-            db.SaveChanges();
-            return Json(new { Url = Url.Action("IndexPartial") });
+        }
+
+        [HttpPost]
+        public JsonResult Update(FormCollection f)
+        {
+            Extensions.request = new RestRequest($"coupons/{f["code"]}", Method.PUT);
+            DateTime from = Convert.ToDateTime(f["valid_from"]);
+            DateTime until = Convert.ToDateTime(f["valid_until"]);
+            var data = JsonConvert.SerializeObject(new
+            {
+                code = f["code"],
+                description = f["description"],
+                discount = f["discount"],
+                count = f["count"],
+                valid_from = String.Format("{0:dd/MM/yyyy HH:mm:ss}", from),
+                valid_until = String.Format("{0:dd/MM/yyyy HH:mm:ss}", until),
+                is_enable = f["is_enable"]=="1"?true:false
+            });
+
+            Extensions.request.AddParameter("application/json", data, ParameterType.RequestBody);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                return Json(new { Url = Url.Action("IndexPartial") });
+            }
+            else
+            {
+                Response.StatusCode = 500;
+                Response.Write(result.Content);
+                return null;
+            }
+
+        }
+
+        [HttpPost]
+        public JsonResult Add(FormCollection f)
+        {
+            Extensions.request = new RestRequest($"coupons", Method.POST);
+
+            DateTime from = Convert.ToDateTime(f["valid_from"]);
+            DateTime until = Convert.ToDateTime(f["valid_until"]);
+            var data = JsonConvert.SerializeObject(new
+            {
+                code = f["code"],
+                description = f["description"],
+                discount = f["discount"],
+                count = f["count"],
+                valid_from = String.Format("{0:dd/MM/yyyy HH:mm:ss}", from),
+                valid_until = String.Format("{0:dd/MM/yyyy HH:mm:ss}", until),
+                is_enable = f["is_enable"] == "1" ? true : false
+            });
+
+            Extensions.request.AddParameter("application/json", data, ParameterType.RequestBody);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                return Json(new { Url = Url.Action("IndexPartial") });
+            }
+            else
+            {
+                Response.StatusCode = 500;
+                Response.Write(result.Content);
+                return null;
+            }
+
         }
     }
 }

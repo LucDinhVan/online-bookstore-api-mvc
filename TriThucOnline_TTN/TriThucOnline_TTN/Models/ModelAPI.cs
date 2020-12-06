@@ -80,6 +80,10 @@ namespace TriThucOnline_TTN.Models
         public string picture { get; set;}
         public int id { get; set;}
         public string name { get; set; }
+        public int? province_code { get; set; }
+        public int? district_code { get; set; }
+        public int? ward_code { get; set; }
+        public List<Order> orders { get; set; }
     }
 
     public class Users
@@ -106,8 +110,8 @@ namespace TriThucOnline_TTN.Models
         public string code { get; set;}
         public string description { get; set;}
         public float discount { get; set;}
-        public float max_value { get; set;}
-        public int count { get; set;}
+        public float? max_value { get; set;}
+        public int? count { get; set;}
         public string valid_from { get; set;}
         public string valid_until { get; set;}
         public bool is_enable { get; set; }
@@ -121,15 +125,15 @@ namespace TriThucOnline_TTN.Models
     public class Order
     {
         public int id { get; set;}
-        public float order_date { get; set;}
-        public float required_date { get; set;}
-        public float shipped_date { get; set;}
+        public float? order_date { get; set;}
+        public float? required_date { get; set;}
+        public float? shipped_date { get; set;}
         public string status { get; set;}
         public string comment { get; set;}
         public float total { get; set;}
         public int user_id { get; set;}
         public string coupon_code { get; set; }
-        public OrderDetails order_details { get; set; }
+        public List<OrderDetail> order_details { get; set; }
         
     }
 
@@ -141,7 +145,7 @@ namespace TriThucOnline_TTN.Models
     public class OrderDetail
     {
         public int id { get; set;}
-        public int quantity { get; set;}
+        public int? quantity { get; set;}
         public float price { get; set;}
         public int order_id { get; set;}
         public int book_id { get; set;}        

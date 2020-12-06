@@ -28,7 +28,6 @@ namespace TriThucOnline_TTN
                       "~/Content/site.css",
                       "~/Content/PagedList.css"));
             Extensions.CreateCookie();
-
         }
     }
 }
