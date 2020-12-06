@@ -442,7 +442,7 @@
                         $("#notifyModal").modal('show');
                     }
                     $("#Cart_Amount").html(data.sl);
-                    $.post(data.Url, function (partial) {
+                    $.get(data.Url, function (partial) {
                         $("#listItemCart").html(partial);
                         //AddToCart(-1);
                         $("#TongTien").attr("style", "color:red");
@@ -510,7 +510,7 @@
                         $("#notifyModal").modal('show');
                     }
                     $("#Cart_Amount").html(data.sl);    //sl navbar
-                    $.post(data.Url, function (partial) {
+                    $.get(data.Url, function (partial) {
                         $("#listItemCart").html(partial);
                         //AddToCart(-1);
                         $("#totalprice").attr("style", "color:red");

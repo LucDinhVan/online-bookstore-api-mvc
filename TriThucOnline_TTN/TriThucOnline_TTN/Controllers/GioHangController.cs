@@ -176,37 +176,46 @@ namespace TriThucOnline_TTN.Controllers
         {
             bool success = true;
             string error = "";
-            List<Cart> listCartItem = (List<Cart>)Session["ShoppingCart"];
-            //nếu người dùng thêm hàng vào giỏ và lại trở về trang chủ thêm hàng tiếp 
-            //thì session shoppingcart này có đang giữ tất cả sách trong giỏ hàng hiện tại hay không ?
-            //có. cập nhật vào Session["ShoppingCart"] mà
-            int cartcount = 0;
-            foreach (var item in listCartItem)
+            Carts carts = null;
+            Extensions.request = new RestRequest($"carts/{id}", Method.PUT);
+            var data = JsonConvert.SerializeObject(new
             {
-                if (item.id == id)
-                {
-                    if (db.DAUSACHes.Find(id).SoLuongTon < sl)
-                    {
-                        success = false;
-                        error = "Rất tiếc, kho hàng của sản phẩm không đủ";
-                    }
-                    else
-                        item.quantity = sl;
-                    // break;
+                quantity = sl
+            });
+            Extensions.request.AddParameter("application/json", data, ParameterType.RequestBody);
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
 
-                }
-                cartcount += item.quantity;
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                
             }
-            Session["ShoppingCart"] = listCartItem;
-
-            return Json(new { Success = success, ErrorMsg = error, Url = Url.Action("Success"), sl = cartcount });
+            else
+            {
+                success = false;
+                error = "Rất tiếc, kho hàng của sản phẩm không đủ";
+                
+            }
+            return Json(new { Success = success, ErrorMsg = error, Url = Url.Action("Success") });
         }
 
-        [HttpPost]
+        [HttpGet]
         public ActionResult Success()
         {
-            List<Cart> lstGioHang = LayGioHang();
-            return PartialView(lstGioHang);
+            Carts carts = null;
+            Extensions.request = new RestRequest($"carts", Method.GET);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
+            {
+                carts = JsonConvert.DeserializeObject<Carts>(result.Content);
+            }
+            return PartialView(carts);
         }
 
         //xoa gio hang
@@ -214,28 +223,30 @@ namespace TriThucOnline_TTN.Controllers
         public ActionResult Remove(int id)
         {
             int cartCount = 0;
-            List<Cart> listCartItem = (List<Cart>)Session["ShoppingCart"];
-            foreach (var item in listCartItem)
+            Carts carts = null;
+            Extensions.request = new RestRequest($"carts/{id}", Method.DELETE);
+
+            var responseTask = Extensions.client.ExecuteAsync(Extensions.request);
+            responseTask.Wait();
+
+            var result = responseTask.Result;
+            if (result.IsSuccessful)
             {
-                if (item.id == id)
-                {
-                    listCartItem.Remove(item);
-                    break;
-                }
+                return Json(new { Url = Url.Action("Success"), sl = cartCount });
             }
-            foreach (var item in listCartItem)
+            else
             {
-                cartCount += item.quantity;
+                //return Giohang Trống
+                return RedirectToAction("GioHangTrong");
             }
-            Session["ShoppingCart"] = listCartItem;
-            return Json(new { Url = Url.Action("Success"), sl = cartCount });
+            
         }
 
         [HttpPost]
         public ActionResult KhuyenMai(string code)
         {
             // GET
-            Coupon cp = new Coupon();
+            Coupon cp = null;
             Extensions.request = new RestRequest($"coupons/{code}", Method.GET);
 
             var responseTask = Extensions.client.ExecuteAsync(Extensions.request);

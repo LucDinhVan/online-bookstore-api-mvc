@@ -8,7 +8,7 @@
 {
     <tr>
         <td class="cart_products-delete">
-            <button style="border:none; background-color: white;" onclick="Remove('@item.book_id')">
+            <button style="border:none; background-color: white;" onclick="Remove('@item.id')">
                 <i class="far fa-trash-alt"></i>
             </button>
         </td>
@@ -22,13 +22,13 @@
         <td style="text-align:center">
             <div class="input-group soluong_giohang">
                 <span class="input-group-btn">
-                    <button type="button" class="quantity-left-minus btn btn-number" data-type="minus" data-field="" onclick="CapNhatSoLuong('@item.book_id', '-')">
+                    <button type="button" class="quantity-left-minus btn btn-number" data-type="minus" data-field="" onclick="CapNhatSoLuong('@item.id', '-')">
                         <span class="glyphicon glyphicon-minus">-</span>
                     </button>
                 </span>
-                <input type="text" id="SoLuong[@item.book_id]" name="quantity" class="form-control input-number" value="@item.quantity" min="1" max="100" step="1" type="number">
+                <input type="text" id="SoLuong[@item.id]" name="quantity" class="form-control input-number" value="@item.quantity" min="1" max="100" step="1" type="number">
                 <span class="input-group-btn">
-                    <button type="button" class="quantity-right-plus btn btn-number" data-type="plus" data-field="" onclick="CapNhatSoLuong('@item.book_id', '+')">
+                    <button type="button" class="quantity-right-plus btn btn-number" data-type="plus" data-field="" onclick="CapNhatSoLuong('@item.id', '+')">
                         <span class="glyphicon glyphicon-plus">+</span>
                     </button>
                 </span>
